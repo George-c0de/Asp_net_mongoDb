@@ -1,0 +1,139 @@
+﻿@using WebApplication1.Models
+@model IEnumerable<Category>
+
+@{
+	ViewData["Title"] = "Создание теста";
+	ViewData["Col"] = 20;
+}
+<style>
+	.row {
+		margin: 5px;
+	}
+	label {
+		margin: 10px;
+		width: 150px;
+	}
+	input {
+		margin: auto;
+		margin-left: 2px;
+		width: 180px;
+	}
+	
+	.button1 {
+		background-color: white; /* Green */
+		border: none;
+		color: white;
+		text-align: center;
+		font-size: 16px;
+		width: 30px;
+		height: 30px;
+		margin: 4px 2px;
+		cursor: pointer;
+		border-radius: 40%;
+	}
+</style>
+<form method="post" asp-action="Create_test" asp-controller="Test" asp-anti-forgery="true">
+	<div class="validation" asp-validation-summary="ModelOnly"></div>
+	<div>
+			<label>Введите название</label>
+			<input name="name" required placeholder="Название теста" type="text"/><br/>
+			<label>Введите время</label>
+			<input name="time" type="number" required min="1" placeholder="мин" /><br/>
+		<label>Введите кол-во категорий</label>
+		<input name="h_col" max="10" min="1" required id="col" type="number"/>
+		
+		<button id="btn1" type="button" class="button1"><img height="30" width="30" src="/img/Без названия (14).png"/>
+		</button>
+			<div class="row" id="add_category" value="@Model">
+			</div>
+		<br/>
+		@*<select>
+			@foreach (var el in Model)
+			{
+				<option name="category" value="@el.Id">@el.Name</option>
+			}
+		</select>*@
+		<div class="form-group">
+			<button disabled="disabled" id="go3" type="submit" value="Добавить тест" class="btn btn-outline-dark">Добавить вопрос</button>
+		</div>
+	</div>
+</form>
+<script>
+	
+	$('#btn1').click(function() {
+		var a = {};
+		$.ajax({
+			type: 'GET',
+			url: '@Url.Action("JsonSearch", "Test")',
+			dataType: 'json',
+			success: function(data) {
+				a = data;
+				var col = Number(document.getElementById('col').value);
+				if (col < 1 || col> data.length) {
+					$("#add_category").empty();
+					$("#add_category").append("<p id='incor'>Некорректное кол-во вопросов</p>");
+					$("#incor").hide(5000);
+				} else {
+					document.getElementById("go3").removeAttribute("disabled");
+					$("#add_category").empty();
+					for (let i = 0; i < col; i++) {
+						var id = "";
+						var name = "";
+						var idSelect = "cat" + i;
+						var id_col = "col" + i;
+						
+						$("#add_category").append($('<div>',
+							{
+								'id': id_col,
+								'class': 'row'
+							}
+						));
+						let elem = document.getElementById(id_col);
+						$(elem).append($('<select>',
+							{
+								'name': idSelect,
+								'class': 'col-3',
+								'id' : idSelect
+							}
+						));
+						$(elem).append($('<label>',
+							{
+								'class': 'col-2',
+								'text': 'Кол-во вопросов'
+							}
+						));
+
+						$(elem).append($('<input>',
+							{
+								'name': id_col,
+								'id': id_col,
+								'class': 'col-3',
+								'value': '1',
+								'min': '1',
+								'max': '10',
+								'type': 'number'
+							}
+						));
+						for (let j = 0; j < a.length; j++) {
+							for(const [key, value] of Object.entries(a[j])){
+								
+								if (key === "id") {
+									id = value;
+								}
+								if (key === "name") {
+									name = value;
+								}
+							}
+							let elem = document.getElementById(idSelect);
+							$(elem).append($('<option>',
+								{
+									'value':id,
+									'text': name
+								}));
+						}	
+					}
+				}
+			}
+		});
+	});
+</script>

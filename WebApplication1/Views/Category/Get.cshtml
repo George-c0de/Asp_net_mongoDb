@@ -1,0 +1,38 @@
+﻿@using WebApplication1.Models
+@model IEnumerable<Question>
+@{
+	
+}
+<style>
+	label {
+		width: 150px;
+		display: inline-block;
+	}
+
+	input {
+		margin: 2px;
+		margin-left: 4px;
+		width: 180px;
+	}
+
+	button {
+		margin: 2px 0;
+		width: 154px;
+		margin-left: 27px;
+		margin-right: auto;
+	}
+</style>
+<main>
+	<h1 class="text-center">@ViewData["Title"]</h1><br/>
+
+	<div class="container">
+
+		<ol>
+			@foreach (var el in Model)
+			{
+				<li>@el.Text</li>
+			}
+		</ol>
+	</div>
+	<a href="@Url.Action( "Get", "Questions", new {id = @ViewData["id"]})"><button onclick="" class="btn btn-dark" type="button">Создать вопрос</button></a><br/>
+</main>

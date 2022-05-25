@@ -1,0 +1,18 @@
+﻿@using WebApplication1.Models
+@model IEnumerable<Question>
+@{
+	ViewData["Title"] = "Список тестов";
+}
+<main>
+	<h1 class="text-center">Вопросы</h1><br/>
+
+	<div class="container">
+		@foreach (var el in Model)
+		{
+			<div class="row">
+				<p>@el.Text</p>
+				<p>Категория: @ViewData[el.id_category]</p>
+			</div><br/>
+		}
+	</div>
+</main>

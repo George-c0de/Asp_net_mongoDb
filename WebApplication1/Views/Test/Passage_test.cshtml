@@ -1,0 +1,216 @@
+﻿@model WebApplication1.Models.Test
+
+<style>
+	.noselect {
+		-moz-user-select: none;
+		-webkit-user-select: none;
+		-webkit-touch-callout: none;   
+		-ms-user-select: none;
+		-o-user-select: none;
+		user-select: none;
+		-khtml-user-select: none;
+	}
+	.rowq {
+		display: flex;
+		border: 1px solid black;
+		overflow-x: auto;
+		overflow-y: hidden;
+		margin: 5px;
+		text-align: center;
+	}
+	.row {
+		display: flex;
+		overflow-x: auto;
+		width: 150px;
+		overflow-y: hidden;
+		margin: 5px;
+	}
+	.image {
+		margin: 2px;
+	}
+	.pad {
+		display: block;
+		width: 100%;
+		padding: 0.375rem 0.75rem;
+		font-size: 1rem;
+		font-weight: 400;
+		line-height: 1.5;
+		color: #212529;
+		background-color: #fff;
+		background-clip: padding-box;
+		border: 1px solid #ced4da;
+		-webkit-appearance: none;
+		-moz-appearance: none;
+		appearance: none;
+		border-radius: 0.25rem;
+		transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+	}
+</style>
+<div id="09" class="rowq">Оставшееся время:
+	<div class="row">
+		<div class="col">Минут: </div>
+		<div id="min" class="col">
+		</div>
+	</div>
+	<div class="row">
+		<div class="col">Секунд: </div>
+		<div class="col" id="seconds">@Model.Time</div>
+		</div>
+	</div>
+<h2>@Model.Name</h2>
+<form method="POST" asp-action="Result_save" asp-controller="Test" asp-anti-forgery="true">
+	<div class="validation" asp-validation-summary="ModelOnly"></div>
+	<input type="hidden" name="id_result" id="id_result" />
+	<input name="col_answer" id="col_answer" type="hidden"/>
+	@foreach (var el in Model.Questions)
+	{
+		foreach (var e in el)
+		{
+			@if (e.Key == "Quantity")
+			{
+				<input id="coli" type="hidden" value="@e.Value"/>
+				for (int i = 0; i < Convert.ToInt16(e.Value); i++)
+				{
+					<div class="pad">
+						<label></label>
+						<p id="namq"></p>
+						<input id="id_q" type="hidden"/>
+						<input id="ans" type="text"/>
+					</div>
+					<br/>
+				}
+			}
+			@if (e.Key == "Category")
+			{
+				<input id="categ" type="hidden" value="@e.Value"/>
+			}
+		}
+	}
+	<button type="submit" class="btn btn-secondary">Ответить</button>
+</form>
+<script>
+	function getRandomInt(max) {
+		return Math.floor(Math.random() * max);
+	}
+
+	function name1(co,ip) {
+		for (var i = 0; i < ip.length; i++) {
+			if (ip[i] === co) {
+				return false;
+			}
+		}
+		return true;
+	}
+	var form_fields = document.getElementsByTagName('label');
+	for (var i = 0; i < form_fields.length; i++) {
+		let b = String(i + 1);
+		form_fields[i].textContent='Вопрос' + ' №' + b;
+	}
+	let len = 0;
+	let len2 = 0;
+	let c = [];
+	let coli4 = [];
+	let p = document.getElementsByTagName('p');
+	let ca4 = document.getElementsByTagName('input');
+	let col_answer = document.getElementById('col_answer');
+	let q = document.getElementById('q');
+	let id_result = document.getElementById('id_result');
+	var paramsString = document.location.search;
+	paramsString = paramsString.slice(4);
+	id_result.value = paramsString;
+	let id_q = [];
+	let ans = [];
+	for (var i = 0; i < ca4.length; i++) {
+		if (ca4[i].id === 'categ') {
+			c.push(ca4[i]);
+		}
+		if(ca4[i].id === 'coli') {
+			coli4.push(ca4[i]);
+		}
+		if (ca4[i].id === 'id_q') {
+			id_q.push(ca4[i]);
+		}
+		if(ca4[i].id === 'ans') {
+			ans.push(ca4[i]);
+		}
+	}
+	let all = 0;
+	for (let i = 0; i < coli4.length; i++) {
+		all = all + Number(coli4[i].value);
+	}
+	col_answer.value = all;
+	for (var i = 0; i < c.length; i++) {
+		$.ajax({
+			type: 'POST',
+			url: '/question/Get_ques?id=' + c[i].value,
+			value: c[i].value,
+			dataType: 'json',
+			success: function(data) {
+				let d = [];
+				for (let j = 0; j < coli4[len2].value; j++)
+				{
+					let fg = getRandomInt(data.length);
+					let flag = true;
+					while(flag)
+					{
+						if (name1(fg, d)) 
+						{
+							d.push(fg);
+							flag = false;
+						} 
+						else 
+						{
+							fg = getRandomInt(data.length);
+						}
+					}
+					p[len].textContent = data[fg].text;
+					id_q[len].value = data[fg].id;
+					id_q[len].name = 'id' + len;
+					ans[len].name = 'q' + len;
+					len = len + 1;
+				}
+				len2 = len2 + 1;
+			}
+		});
+	}
+	$(document).ready(function() {
+		var _Seconds = $('#seconds').text(),
+			int;
+		var _Min = 0;
+		int = setInterval(function() { // запускаем интервал
+				if (_Seconds > 60) {
+					let ost = Math.floor(_Seconds / 60);
+					_Min = ost;
+					$('#min').text(_Min);
+					_Seconds = _Seconds - ost * 60;
+					$('#seconds').text(_Seconds);
+				}
+				if (_Min > 0 && _Seconds === 0) {
+					_Min = _Min - 1;
+					$('#min').text(_Min);
+					_Seconds = _Seconds + 60;
+				}
+				if (_Seconds > 0) {
+					_Seconds--; // вычитаем 1
+					$('#seconds').text(_Seconds); // выводим получившееся значение в блок
+				} else {
+					clearInterval(int); // очищаем интервал, чтобы он не продолжал работу при _Seconds = 0
+					alert('End!');
+					var f = String("@ViewData["id_r"]");
+					window.location.href = '/test/result?id=' + f;
+				}
+			},
+			1000);
+		Otv();
+
+		function Otv() {
+			var col = Number(document.getElementById("coli").value);
+			var cat = document.getElementById("categ");
+			for (let i = 0; i < col; i++) {
+				$("#qv").text('adada');
+			}
+		}
+
+		$('#c_1').hide(0);
+	});
+</script>

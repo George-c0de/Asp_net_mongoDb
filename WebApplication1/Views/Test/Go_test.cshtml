@@ -1,0 +1,56 @@
+﻿@using Microsoft.CodeAnalysis.VisualBasic.Syntax
+@using System.Reflection.Metadata
+
+<style>
+	input {
+		margin: 5px;
+	}
+	button {
+		margin: 5px;
+		height: 30px;
+		text-align: center;
+		margin-left: 1px;
+	}
+</style>
+<div id="caren">
+<label for="test_kod">
+	Введите код: 
+</label >
+	<input required="true" id="test_kod"/><br/>
+	<div id="er">
+		
+	</div>
+<button id="dtn_go_test" class="btn btn-success">Открыть тест</button>
+</div>
+<script>
+	$(document).ready(function() {
+		$('#c_1').hide(0);
+	});
+	$("#er").mouseout(function() {
+		$("#c_1").hide("fast");
+	});
+	$("#dtn_go_test").click(function() {
+		var id = document.getElementById("test_kod").value;
+		$.ajax({
+			type: 'POST',
+			url: '/test/Get_test?id=' + id,
+			value: id,
+			dataType: 'json',
+			success: function(data) {
+				console.log(data);
+				if (data === "Error") {
+					$("#er").empty();
+					$("#er").append($('<p>',
+						{
+							'id': 'c_1',
+							'text': 'Неверный код'
+						}));
+					$("#er").css('color', 'red');
+				} else if (data !== "Error") {
+					document.getElementById("caren").remove();
+					window.location.href = '/test/Passage_test?id=' + id;
+				}
+			}
+		});
+	});
+</script>

@@ -1,0 +1,37 @@
+﻿@using WebApplication1.Models
+@model IEnumerable<Category>
+@{
+	ViewData["Title"] = "Список Категорий";
+}
+<style type="text/css">
+	A {
+		text-decoration: none; /* Убирает подчеркивание для ссылок */
+		color: black;
+	} 
+	A:hover { 
+		text-decoration: underline; /* Добавляем подчеркивание при наведении курсора на ссылку */
+		color: red; /* Ссылка красного цвета */
+	} 
+	button {
+		margin: 2px 0;
+		margin-left: 27px;
+		margin-right: auto;
+	}
+</style>
+<main>
+	<h1 class="text-center">Категории</h1><br/>
+
+	<div class="container"><ol>
+			@foreach (var el in Model)
+			{
+				<li> <a href="@Url.Action("Get","Category", new {id = @el.Id})">@el.Name</a>
+				</li>
+			}
+		</ol>
+	</div>
+	<a href="@Url.Action("Create","Category")">
+		<button class="btn btn-dark" type="button">
+			Добавить категорию
+		</button>
+	</a>
+</main>

@@ -1,0 +1,32 @@
+﻿@model WebApplication1.ViewModels.CategoryModel
+<style>
+	label {
+		width: 150px;
+	}
+
+	input {
+		margin: 2px;
+		margin-left: 2px;
+		width: 180px;
+	}
+
+	button {
+		margin: 2px 0;
+		width: 154px;
+		margin-left: auto;
+		margin-right: auto;
+	}
+</style>
+<form method="post" asp-action="Create" asp-controller="Category" asp-anti-forgery="true">
+	<div class="validation" asp-validation-summary="ModelOnly"></div>
+	<div>
+		<div class="form-group">
+			<label asp-for="Name">Введите название</label>
+			<input type="text" asp-for="Name" />
+			<span asp-validation-for="Name" />
+		</div>
+		<div class="form-group">
+			<input type="submit" value="Добавить вопрос" class="btn btn-outline-dark" />
+		</div>
+	</div>
+</form>

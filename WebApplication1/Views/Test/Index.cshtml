@@ -1,0 +1,10 @@
+﻿@model WebApplication1.Models.IndexViewModel
+ 
+@{
+	ViewData["Title"] = "Список пользователей";
+	ViewData["User"] = User.Identity.Name;
+}
+ 
+
+<h2>@ViewData["Title"]</h2>
+<h1>@ViewData["User"]</h1>
