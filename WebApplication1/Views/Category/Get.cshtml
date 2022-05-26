@@ -4,22 +4,50 @@
 	
 }
 <style>
-	label {
-		width: 150px;
-		display: inline-block;
+	.rectangle {
+		counter-reset: li; 
+		list-style: none; 
+		font: 14px "Trebuchet MS", "Lucida Sans";
+		padding: 0;
+		text-shadow: 0 1px 0 rgba(255,255,255,.5);
 	}
-
-	input {
-		margin: 2px;
-		margin-left: 4px;
-		width: 180px;
+	.rectangle li {
+		position: relative;
+		display: block;
+		padding: .4em .4em .4em .8em;
+		margin: .5em 0 .5em 2.5em;
+		background: #D3D4DA;
+		color: #444;
+		text-decoration: none;
+		transition: all .3s ease-out;
 	}
-
-	button {
-		margin: 2px 0;
-		width: 154px;
-		margin-left: 27px;
-		margin-right: auto;
+	.rectangle li:hover {background: #DCDDE1;}       
+	.rectangle li:before {
+		content: counter(li);
+		counter-increment: li;
+		position: absolute;
+		left: -2.5em;
+		top: 50%;
+		margin-top: -1em;
+		background: #9097A2;
+		height: 2em;
+		width: 2em;
+		line-height: 2em;
+		text-align: center;
+		font-weight: bold;
+	}
+	.rectangle li:after {
+		position: absolute;
+		content: "";
+		border: .5em solid transparent;
+		left: -1em;
+		top: 50%;
+		margin-top: -.5em;
+		transition: all .3s ease-out;
+	}
+	.rectangle li:hover:after {
+		left: -.5em;
+		border-left-color: #9097A2;
 	}
 </style>
 <main>
@@ -27,7 +55,7 @@
 
 	<div class="container">
 
-		<ol>
+		<ol class="rectangle">
 			@foreach (var el in Model)
 			{
 				<li>@el.Text</li>

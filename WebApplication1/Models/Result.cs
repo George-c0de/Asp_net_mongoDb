@@ -19,7 +19,7 @@ namespace WebApplication1.Models
         public List<Dictionary<string, string>> Answers { get; set; }
 
         [Display(Name = "Процент решений по категориям")]
-        public List<double> Percentage_category { get; set; }
+        public Dictionary<string, double> Percentage_category { get; set; }
 
         [Display(Name = "Общий процент")]
         public double Percent { get; set; }

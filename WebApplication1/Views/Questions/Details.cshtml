@@ -3,6 +3,18 @@
 @{
 	ViewData["Title"] = "Список тестов";
 }
+<style>
+	p {
+		text-align: left;
+		border-left: 1px solid #ddd;
+		border-right: 1px solid #ddd;
+		vertical-align: top;
+	}
+	.line {
+		border-bottom: 1px solid #000; /* Параметры линии */
+		margin: 1px;
+	}
+</style>
 <main>
 	<h1 class="text-center">Вопросы</h1><br/>
 
@@ -12,7 +24,8 @@
 			<div class="row">
 				<p>@el.Text</p>
 				<p>Категория: @ViewData[el.id_category]</p>
-			</div><br/>
+			</div>
+			<div class="line"></div>
 		}
 	</div>
 </main>

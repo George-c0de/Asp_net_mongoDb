@@ -2,50 +2,56 @@
  
 
 <style>
-	a { text-decoration: none; color: navy; }
-	a:hover { text-decoration: underline; }
+	
 	h2 {
-		margin-left: auto;
-		margin-right: auto;
-		display: inline-block;
-		vertical-align: middle;
+		display: flex;
+		align-items: center;
+		align-content: center; 
+		justify-content: center; 
 	}
 	label {
-		margin: 2px;
+		margin: 10px;
 		width: 150px;
 	}
-	input[type="text"] {
+	input {
 		margin: auto;
 		margin-left: 2px;
 		width: 180px;
 	}
 	input[id="btn-reg"] {
-		margin-left: 0;
 		margin: 10px;
+		margin-left: 40px;
+		width: 110px;
 	}
-
+	form[id="form_reg"] {
+		display: flex;
+		align-items: center;
+		align-content: center; 
+		justify-content: center; 
+		overflow: auto;   
+	}
 </style>
 <h2>Регистрация</h2>
-<form asp-action="Register" asp-controller="Users" asp-anti-forgery="true">
+<form id="form_reg" asp-action="Register" asp-controller="Users" asp-anti-forgery="true">
 	<div class="validation" asp-validation-summary="ModelOnly"></div>
 	<div>
-		<div>
+		<div class="form-group">
 			<label asp-for="Name">Введите Имя</label><br />
-			<input type="text" asp-for="Name" />
+			<input asp-for="Name" />
 			<span asp-validation-for="Name" />
 		</div>
-		<div>
+		<div class="form-group">
 			<label asp-for="Password">Введите пароль</label><br />
 			<input asp-for="Password" />
 			<span asp-validation-for="Password" />
 		</div>
-		<div>
+		<div class="form-group">
 			<label asp-for="ConfirmPassword">Повторите пароль</label><br />
 			<input asp-for="ConfirmPassword" />
 			<span asp-validation-for="ConfirmPassword" />
 		</div>
-		<div>
-			<input id="btn-reg" class="btn btn-primary" type="submit" value="Регистрация" />
+		<div class="form-group">
+			<input id="btn-reg" class="btn btn-outline-dark" type="submit" value="Регистрация" />
 		</div>
 	</div>
 </form>

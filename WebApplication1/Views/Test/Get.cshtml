@@ -4,6 +4,33 @@
 	ViewData["Title"] = "Список тестов";
 	ViewData["Col"] = 20;
 }
+<style>
+	a[class="1"] {
+		text-decoration: none;
+		color: #0f7afc;
+		border-bottom: 1px solid;
+		border-bottom-color: rgba(15, 122, 252, 0.2);
+	}
+	.table {
+		width: 100%;
+		margin-bottom: 20px;
+		border: 15px solid #F2F8F8;
+		border-top: 5px solid #F2F8F8;
+		border-collapse: collapse; 
+	}
+	.table th {
+		font-weight: bold;
+		padding: 5px;
+		background: #F2F8F8;
+		border: none;
+		border-bottom: 5px solid #F2F8F8;
+	}
+	.table td {
+		padding: 5px;
+		border: none;
+		border-bottom: 5px solid #F2F8F8;
+	}
+</style>
 <main>
 	<script type="text/javascript">
 		$(function() {
@@ -39,7 +66,7 @@
 							<p>@el.Name</p>
 						</div>
 						<div class="col">
-							@Html.ActionLink("Открыть", "Test","Test", new {id = el.Id})
+							<a href="/test/Test/@el.Id" class="1">Открыть</a>
 						</div>
 					</div>
 				</td>

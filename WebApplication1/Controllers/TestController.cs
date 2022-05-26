@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using System.Net;
+using System.Net.Mail;
 using Microsoft.AspNetCore.Mvc;
 using WebApplication1.Models;
 using WebApplication1.Services;
@@ -51,7 +53,110 @@ namespace WebApplication1.Controllers
                 return "error";
             }
             return a.Result.id_category;
+        }
 
+        public Dictionary<string, double> analis2(List<Dictionary<string, string>> result)
+        {
+            Dictionary <string, double> cat = new Dictionary<string, double>();
+            int col = result.Count;
+            foreach (var el in result)
+            {
+                double right = 0;
+                bool flag = false;
+                var name = _categoryServices.GetAsync(el["id_category"]).Result.Name;
+                
+                var q = _questionServices.GetAsync(el["id"]).Result;
+                if (el["answer"] == q.Answer)
+                {
+                    right = 1;
+                }
+                foreach (var l in cat)
+                {
+                    var id_c = _categoryServices.GetAsync(el["id_category"]).Result.Name;
+                    if (id_c == l.Key)
+                    {
+                        flag = true;
+                    }
+                }
+                if (!flag)
+                {
+                    cat.Add(name,right);
+                }
+                else
+                {
+                    cat[name] = cat[name] + right;
+                }
+            }
+            
+            return cat;
+        }
+
+        public int get_r(List<Dictionary<string, string>> result)
+        {
+            int col = result.Count();
+            double percent = 0;
+            int right = 0;
+            foreach (var el in result)
+            {
+                var v = _questionServices.GetAsync(el["id"]);
+                if (v.Result.Answer == el["answer"])
+                {
+                    right++;
+                }
+            }
+
+            return right;
+        }
+        public double get_Percent(List<Dictionary<string, string>> result)
+        {
+            double col = result.Count();
+            double percent = 0;
+            double right = 0;
+            foreach (var el in result)
+            {
+                var v =  _questionServices.GetAsync(el["id"]);
+                if (v.Result.Answer == el["answer"])
+                {
+                    right++;
+                }
+            }
+            percent = (right / col) * 100;
+            return percent;
+        }
+
+        [HttpPost]
+        [AllowAnonymous]
+        public async Task<IActionResult> Send_mess()
+        {
+            MailAddress from = new MailAddress("Test_Company@gmail.com", "Test_Company");
+            //komy
+            MailAddress to = new MailAddress(Request.Form["email"]);
+            MailMessage m = new MailMessage(from, to);
+            // тема письма
+            m.Subject = "Тест";
+            // текст письма
+            string body;
+            var t = _resultatservices.GetAsync(Request.Form["id"]).Result;
+            var test = _testsService.GetAsync(t.Id_test).Result.Name;
+            body = "<h5>" + test + "</h5>";
+            body += "<p>" + "Количество правильных ответов по категориям" + "</p>";
+            foreach (var el in t.Percentage_category)
+            {
+                body +="<p>"+"Категория: " + el.Key + " : " +el.Value + "</p>";
+            }
+            body+= "<p>" + "Доля правильных ответов" + t.Percent + "</p>";
+            body+= "<p>" + "Ваши рекомендации" + "</p>";
+            body+= "<p>" + t.recommendations + "</p>";
+            m.Body = body;
+            // письмо представляет код html
+            m.IsBodyHtml = true;
+            // адрес smtp-сервера и порт, с которого будем отправлять письмо
+            SmtpClient smtp = new SmtpClient("smtp.gmail.com", 587);
+            // логин и пароль
+            smtp.Credentials = new NetworkCredential("Test_Company@gmail.com", "mypassword");
+            smtp.EnableSsl = true;
+            smtp.Send(m);
+            return Redirect("");
         }
         [HttpPost]
         [AllowAnonymous]
@@ -74,15 +179,45 @@ namespace WebApplication1.Controllers
                 result.Add(res_temp);
             }
             var res_ = _resultatservices.GetAsync(id_result);
-
-            var newResult = new Result { Value = "true", Answers = result, Id_test = res_.Result.Id_test, };
-
-
-            _resultatservices.UpdateAsync(res_.Result.Id, newResult);
+            var analis = analis2(result);
+            analis.OrderBy(pair => pair.Value);
+            string rec = "";
+            if (analis.First().ToString() != analis.Last().ToString())
+            {
+                rec = "Ваша самая лучшая категория: " + analis.First().Key
+                                                             + "\n" + "Ваша самая худшая категория " + analis.Last().Key;
+            }
+            else if(get_Percent(result)==0)
+            {
+                rec = "Тест завален";
+            }
+            else
+            {
+                rec = "Тест пройден на " + get_Percent(result) + "%";
+            }
+            var newResult = new Result { Id = res_.Result.Id, Value = "true", Answers = result, Id_test = res_.Result.Id_test,Percent = get_Percent (result), Percentage_category = analis, recommendations = rec};
+            _resultatservices.RemoveAsync(res_.Result.Id);
             _resultatservices.CreateAsync(newResult);
-            return Redirect("Home");
+            return Redirect(@Url.Action("Send", "Test", new { id = res_.Result.Id }));
         }
 
+        [HttpGet]
+        [AllowAnonymous]
+        public IActionResult Send(string id)
+        {
+            var analis = _resultatservices.GetAsync(id);
+            var name = _testsService.GetAsync(analis.Result.Id_test).Result.Name;
+            ViewData["name_test"] = name;
+            if (analis.Result == null)
+            {
+                return Redirect("Home");
+            }
+            else
+            {
+                return View(analis.Result);
+            }
+        }
+        
         [HttpGet]
         [AllowAnonymous]
         public async Task<IActionResult> Passage_test(string id)

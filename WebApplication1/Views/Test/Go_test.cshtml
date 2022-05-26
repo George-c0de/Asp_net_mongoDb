@@ -7,7 +7,7 @@
 	}
 	button {
 		margin: 5px;
-		height: 30px;
+		height: 35px;
 		text-align: center;
 		margin-left: 1px;
 	}
@@ -37,7 +37,6 @@
 			value: id,
 			dataType: 'json',
 			success: function(data) {
-				console.log(data);
 				if (data === "Error") {
 					$("#er").empty();
 					$("#er").append($('<p>',
@@ -46,7 +45,17 @@
 							'text': 'Неверный код'
 						}));
 					$("#er").css('color', 'red');
-				} else if (data !== "Error") {
+				} 
+				else if (data.value === 'true') {
+					$("#er").empty();
+					$("#er").append($('<p>',
+						{
+							'id': 'c_1',
+							'text': 'Тест уже был пройден'
+						}));
+					$("#er").css('color', 'red');
+				}
+				else if (data !== "Error") {
 					document.getElementById("caren").remove();
 					window.location.href = '/test/Passage_test?id=' + id;
 				}
