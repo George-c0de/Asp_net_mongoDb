@@ -108,8 +108,8 @@ public class UsersController : Controller
         Request.ContentType = "application/json";
         if (ModelState.IsValid)
         {
-            var user = _usersService.GetAsync();
-            foreach (var el in user.Result)
+            var user = await _usersService.GetAsync();
+            foreach (var el in user)
             {
                 if (el.Name == model.Name && el.Password == model.Password)
                 {

@@ -36,22 +36,22 @@ namespace WebApplication1.Controllers
 
         [HttpPost]
         [AllowAnonymous]
-        public JsonResult Get_ques(string id)
+        public async Task<JsonResult> Get_ques(string id)
         {
             if (id.Length != 24)
             {
                 return Json("Error");
             }
-            var a = _questionsService.GetAsync_id_cat(id);
-            if (a.Result == null)
+            var a = await _questionsService.GetAsync_id_cat(id);
+            if (a == null)
             {
                 return Json("Error");
             }
-            return Json(a.Result);
+            return Json(a);
         }
 
         [HttpGet]
-        public async Task<IActionResult> Get(string id)
+        public IActionResult Get(string id)
         {
             ViewData["id"] = id;
             return View();
@@ -89,8 +89,8 @@ namespace WebApplication1.Controllers
             var question = await _questionsService.GetAsync();
             foreach (var el in question)
             {
-                var log = _categoryService.GetAsync(el.id_category);
-                string name = log.Result.Name;
+                var log = await _categoryService.GetAsync(el.id_category);
+                string name = log.Name;
                 ViewData[(el.id_category)] = name;
             }
             return View(question);
