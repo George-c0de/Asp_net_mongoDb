@@ -25,34 +25,34 @@ namespace WebApplication1.Controllers
             return View();
         }
         [HttpPost]
-        public IActionResult Create([FromForm] CategoryModel model)
+        public async Task<IActionResult> Create([FromForm] CategoryModel model)
         {
             Request.ContentType = "application/json";
             if (ModelState.IsValid)
             {
-                var category = _categoryServices.GetAsync();
+                var category = await _categoryServices.GetAsync();
                 var newCategory = new Category { Name = model.Name};
-                _categoryServices.CreateAsync(newCategory);
+                await _categoryServices.CreateAsync(newCategory);
             }
             string a = @Url.Action("Index", "Category");
             return Redirect(a);
         }
         [HttpGet]
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            var a = _categoryServices.GetAsync();
-            var b = a.Result;
+            var a = await _categoryServices.GetAsync();
+            var b = a;
             return View(b);
         }
         [HttpGet]
-        public IActionResult Get(string id)
+        public async Task<IActionResult> Get(string id)
         {
-            var a = _categoryServices.GetAsync(id);
-            var b = a.Result;
-            Task<List<Question>> c = _questionServices.GetAsync_id_cat(b.Id);
+            var a = await _categoryServices.GetAsync(id);
+            var b = a;
+            List<Question> c = await _questionServices.GetAsync_id_cat(b.Id);
             ViewData["Title"] = b.Name;
             ViewData["id"] = b.Id;
-            return View(c.Result);
+            return View(c);
         }
     }
 }
