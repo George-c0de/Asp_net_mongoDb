@@ -39,13 +39,13 @@ namespace WebApplication1.Controllers
 
         [HttpGet]
         [AllowAnonymous]
-        public async Task<JsonResult> Get_q(string id)
+        public async Task<JsonResult> GetQuestion(string id)
         {
             var a = await _resultatservices.GetAsync(id);
             return Json(a);
         }
 
-        public async Task<string> get_cat_q(string id)
+        public async Task<string> GetCategoryByQuestion(string id)
         {
             var a = await _questionServices.GetAsync(id);
             if (a == null)
@@ -55,7 +55,7 @@ namespace WebApplication1.Controllers
             return a.id_category;
         }
 
-        public async Task<Dictionary<string, double>> analis2(List<Dictionary<string, string>> result)
+        public async Task<Dictionary<string, double>> GetAnalysis(List<Dictionary<string, string>> result)
         {
             Dictionary <string, double> cat = new Dictionary<string, double>();
             int col = result.Count;
@@ -91,7 +91,7 @@ namespace WebApplication1.Controllers
             return cat;
         }
 
-        public async Task<int> get_r(List<Dictionary<string, string>> result)
+        public async Task<int> GetCorrectAnswers(List<Dictionary<string, string>> result)
         {
             int col = result.Count();
             double percent = 0;
@@ -106,7 +106,7 @@ namespace WebApplication1.Controllers
             }
             return right;
         }
-        public async Task<double> get_Percent(List<Dictionary<string, string>> result)
+        public async Task<double> GetPercent(List<Dictionary<string, string>> result)
         {
             double col = result.Count();
             double percent = 0;
@@ -124,7 +124,7 @@ namespace WebApplication1.Controllers
         }
         [HttpPost]
         [AllowAnonymous]
-        public async Task<IActionResult> Send_mess()
+        public async Task<IActionResult> SendMessage()
         {
             MailAddress from = new MailAddress("Test_Company@gmail.com", "Test_Company");
             //komy
@@ -159,7 +159,7 @@ namespace WebApplication1.Controllers
         }
         [HttpPost]
         [AllowAnonymous]
-        public async Task<IActionResult> Result_save()
+        public async Task<IActionResult> SaveResult()
         {
             int col = Convert.ToInt16(Request.Form["col_answer"]);
             string id_result = Request.Form["id_result"].ToString();
@@ -174,12 +174,12 @@ namespace WebApplication1.Controllers
                 Dictionary<string, string> res_temp = new Dictionary<string, string>();
                 res_temp.Add("id", id_a);
                 res_temp.Add("answer", answer);
-                var val = await get_cat_q(id_a);
+                var val = await GetCategoryByQuestion(id_a);
                 res_temp.Add("id_category", val);
                 result.Add(res_temp);
             }
             var res_ = await _resultatservices.GetAsync(id_result);
-            var analis = await analis2(result);
+            var analis = await GetAnalysis(result);
             analis.OrderBy(pair => pair.Value);
             string rec = "";
             if (analis.First().ToString() != analis.Last().ToString())
@@ -187,23 +187,23 @@ namespace WebApplication1.Controllers
                 rec = "Ваша самая лучшая категория: " + analis.First().Key
                                                              + "\n" + "Ваша самая худшая категория " + analis.Last().Key;
             }
-            else if(await get_Percent(result)==0)
+            else if(await GetPercent(result)==0)
             {
                 rec = "Тест завален";
             }
             else
             {
-                rec = "Тест пройден на " + await get_Percent(result) + "%";
+                rec = "Тест пройден на " + await GetPercent(result) + "%";
             }
-            var newResult = new Result { Id = res_.Id, Value = "true", Answers = result, Id_test = res_.Id_test,Percent = await get_Percent (result), Percentage_category = analis, recommendations = rec};
+            var newResult = new Result { Id = res_.Id, Value = "true", Answers = result, Id_test = res_.Id_test,Percent = await GetPercent(result), Percentage_category = analis, recommendations = rec};
             await _resultatservices.RemoveAsync(res_.Id);
             await _resultatservices.CreateAsync(newResult);
-            return Redirect(@Url.Action("Send", "Test", new { id = res_.Id }));
+            return Redirect(@Url.Action("ShowResult", "Test", new { id = res_.Id }));
         }
 
         [HttpGet]
         [AllowAnonymous]
-        public async Task<IActionResult> Send(string id)
+        public async Task<IActionResult> ShowResult(string id)
         {
             var analis = await _resultatservices.GetAsync(id);
             var name_ = await _testsService.GetAsync(analis.Id_test);
@@ -221,7 +221,7 @@ namespace WebApplication1.Controllers
         
         [HttpGet]
         [AllowAnonymous]
-        public async Task<IActionResult> Passage_test(string id)
+        public async Task<IActionResult> GetPassage(string id)
         {
                 var res = await _resultatservices.GetAsync(id);
                 var test = await _testsService.GetAsync(res.Id_test);
@@ -230,7 +230,7 @@ namespace WebApplication1.Controllers
         }
         [HttpPost]
         [AllowAnonymous]
-        public async Task<JsonResult> Get_test(string id)
+        public async Task<JsonResult> GetTest(string id)
         {
             if (id.Length != 24)
             {
@@ -245,13 +245,13 @@ namespace WebApplication1.Controllers
         }
         [HttpGet]
         [AllowAnonymous]
-        public IActionResult Go_test()
+        public IActionResult GetTestByCode()
         {
             return View();
         }
 
         [HttpGet]
-        public async Task<JsonResult> Get_url(string id)
+        public async Task<JsonResult> GetUrl(string id)
         {
             var newRes = new Result { Value = "false", Id_test = id};
             await _resultatservices.CreateAsync(newRes);
@@ -259,7 +259,7 @@ namespace WebApplication1.Controllers
             return Json(a);
         }
         [HttpPost]
-        public async Task<IActionResult> Create_test()
+        public async Task<IActionResult> CreateTest()
         {
             List<Dictionary<string, string>> questions = new List<Dictionary<string, string>>();
             Dictionary<string, string> quest = new Dictionary<string,string>();
@@ -285,10 +285,10 @@ namespace WebApplication1.Controllers
             }
             var newUser = new Test { Name = Request.Form["name"][0], Questions = questions,Time = Request.Form["time"][0]};
             await _testsService.CreateAsync(newUser);
-            return Redirect(@Url.Action("Get","Test"));
+            return Redirect(@Url.Action("OpenTestById", "Test"));
         }
 
-        public async Task<IActionResult> Get()
+        public async Task<IActionResult> OpenTestById()
         {
                 var a = await _testsService.GetAsync();
                 var b = a;
@@ -304,7 +304,7 @@ namespace WebApplication1.Controllers
         }
 
         [Microsoft.AspNetCore.Mvc.HttpGet("{id:length(24)}")]
-        public async Task<ActionResult<string>> Test(string id)
+        public async Task<ActionResult<string>> CreateCodeForTest(string id)
         {
             var test = await _testsService.GetAsync(id);
             foreach (var cat in test.Questions)
@@ -313,7 +313,7 @@ namespace WebApplication1.Controllers
                 {
                     if (e.Key == "Category")
                     {
-                        ActionResult<string> log = await Category_get(e.Value);
+                        ActionResult<string> log = await GetCategory(e.Value);
                         string name = log.Value;
                         ViewData[(e.Value).ToString()] = name;
                     }
@@ -323,7 +323,7 @@ namespace WebApplication1.Controllers
         }
 
         [Microsoft.AspNetCore.Mvc.HttpGet]
-        public async Task<ActionResult<string>> Category_get(string id)
+        public async Task<ActionResult<string>> GetCategory(string id)
         {
             var category = await _categoryServices.GetAsync(id);
             if (category is null)

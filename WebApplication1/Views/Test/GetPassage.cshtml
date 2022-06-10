@@ -58,7 +58,7 @@
 		</div>
 	</div>
 <h2>@Model.Name</h2>
-<form method="POST" asp-action="Result_save" asp-controller="Test" asp-anti-forgery="true">
+<form method="POST" asp-action="SaveResult" asp-controller="Test" asp-anti-forgery="true">
 	<div class="validation" asp-validation-summary="ModelOnly"></div>
 	<input type="hidden" name="id_result" id="id_result" />
 	<input name="col_answer" id="col_answer" type="hidden"/>
@@ -142,7 +142,7 @@
 	for (var i = 0; i < c.length; i++) {
 		$.ajax({
 			type: 'POST',
-			url: '/question/Get_ques?id=' + c[i].value,
+			url: '/question/GetQuestions?id=' + c[i].value,
 			value: c[i].value,
 			dataType: 'json',
 			success: function(data) {

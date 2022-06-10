@@ -46,7 +46,7 @@
 		id = String("@Model.Id");
 		$.ajax({
 			type: 'GET',
-			url:'/test/get_url?id=' + id,
+			url:'/test/GetUrl?id=' + id,
 			dataType: 'json',
 			success: function(data) {
 				let url = data.id;

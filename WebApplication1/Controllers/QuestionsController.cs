@@ -36,7 +36,7 @@ namespace WebApplication1.Controllers
 
         [HttpPost]
         [AllowAnonymous]
-        public async Task<JsonResult> Get_ques(string id)
+        public async Task<JsonResult> GetQuestions(string id)
         {
             if (id.Length != 24)
             {
@@ -81,7 +81,7 @@ namespace WebApplication1.Controllers
                 var newQuestion = new Question { Text = model.Text, Answer = model.Answer, Note = note_, id_category = model.id_category };
                 await _questionsService.CreateAsync(newQuestion);
             }
-            string a = @Url.Action("Get", "Category", new { id = model.id_category });
+            string a = @Url.Action("GetQuestionByCategory", "Category", new { id = model.id_category });
             return Redirect(a);
         }
         public async Task<ActionResult> Details()
