@@ -9,7 +9,7 @@ namespace WebApplication1.Controllers
         [Authorize]
         public IActionResult Index()
         {
-            return Redirect("test/Get");
+            return Redirect("test/OpenTestById");
         }
 
         //// GET: HomeController

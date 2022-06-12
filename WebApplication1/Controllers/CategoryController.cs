@@ -45,7 +45,7 @@ namespace WebApplication1.Controllers
             return View(b);
         }
         [HttpGet]
-        public async Task<IActionResult> Get(string id)
+        public async Task<IActionResult> GetQuestionByCategory(string id)
         {
             var a = await _categoryServices.GetAsync(id);
             var b = a;

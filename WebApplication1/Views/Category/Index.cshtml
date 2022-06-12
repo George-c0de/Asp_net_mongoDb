@@ -57,7 +57,7 @@
 	<div ><ol class="rectangle">
 			@foreach (var el in Model)
 			{
-				<li> <a href="@Url.Action("Get","Category", new {id = @el.Id})">@el.Name</a>
+				<li> <a href="@Url.Action("GetQuestionByCategory","Category", new {id = @el.Id})">@el.Name</a>
 				</li>
 			}
 		</ol>

@@ -33,7 +33,7 @@
 		var id = document.getElementById("test_kod").value;
 		$.ajax({
 			type: 'POST',
-			url: '/test/Get_test?id=' + id,
+			url: '/test/GetTest?id=' + id,
 			value: id,
 			dataType: 'json',
 			success: function(data) {
@@ -57,7 +57,7 @@
 				}
 				else if (data !== "Error") {
 					document.getElementById("caren").remove();
-					window.location.href = '/test/Passage_test?id=' + id;
+					window.location.href = '/test/GetPassage?id=' + id;
 				}
 			}
 		});
