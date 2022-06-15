@@ -59,7 +59,10 @@ namespace WebApplication1.Controllers
         [HttpPost]
         public async Task<IActionResult> Create([FromForm] QuestionsModel model)
         {
-            Request.ContentType = "application/json";
+            if (Request != null)
+            {
+                Request.ContentType = "application/json";
+            }
             string b = @Url.Action("Details", "Questions");
             Redirect(b);
             if (ModelState.IsValid)
@@ -81,7 +84,11 @@ namespace WebApplication1.Controllers
                 var newQuestion = new Question { Text = model.Text, Answer = model.Answer, Note = note_, id_category = model.id_category };
                 await _questionsService.CreateAsync(newQuestion);
             }
-            string a = @Url.Action("GetQuestionByCategory", "Category", new { id = model.id_category });
+
+            string a = "/category/GetQuestionByCategory";
+            if(@Url!=null)
+                a = @Url.Action("GetQuestionByCategory", "Category", new { id = model.id_category });
+            
             return Redirect(a);
         }
         public async Task<ActionResult> Details()
