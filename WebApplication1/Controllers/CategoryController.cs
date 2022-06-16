@@ -27,14 +27,19 @@ namespace WebApplication1.Controllers
         [HttpPost]
         public async Task<IActionResult> Create([FromForm] CategoryModel model)
         {
-            Request.ContentType = "application/json";
+            if(Request != null)
+                Request.ContentType = "application/json";
             if (ModelState.IsValid)
             {
                 var category = await _categoryServices.GetAsync();
                 var newCategory = new Category { Name = model.Name};
                 await _categoryServices.CreateAsync(newCategory);
             }
-            string a = @Url.Action("Index", "Category");
+            string a = "/category/Index";
+            if (@Url != null)
+            {
+                a = @Url.Action("Index", "Category");
+            }
             return Redirect(a);
         }
         [HttpGet]

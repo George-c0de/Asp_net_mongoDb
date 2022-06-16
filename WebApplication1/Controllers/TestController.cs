@@ -285,6 +285,7 @@ namespace WebApplication1.Controllers
             }
             var newUser = new Test { Name = Request.Form["name"][0], Questions = questions,Time = Request.Form["time"][0]};
             await _testsService.CreateAsync(newUser);
+            
             return Redirect(@Url.Action("OpenTestById", "Test"));
         }
 
