@@ -18,20 +18,9 @@
 
 	@foreach (var el in Model.Questions)
 	{
-		@foreach (var a in el)
-		{
-			@if (a.Key == "Category")
-			{
-				<h6>Категория: @ViewData[a.Value]</h6>
-			}
-		}
-		@foreach (var a in el)
-		{
-			@if (a.Key == "Quantity")
-			{
-				<p>Кол-во вопросов: @a.Value</p>
-			}
-		}
+				<h6>Категория: @ViewData[el.Category]</h6>
+		
+				<p>Кол-во вопросов: @el.Quantity</p>
 	}
 	<h5>Время на тест: @Model.Time</h5>
 

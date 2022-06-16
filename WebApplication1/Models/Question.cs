@@ -4,6 +4,7 @@ using MongoDB.Bson.Serialization.Attributes;
 
 namespace WebApplication1.Models
 {
+    [BsonIgnoreExtraElements]
     public class Question
     {
         [BsonId]

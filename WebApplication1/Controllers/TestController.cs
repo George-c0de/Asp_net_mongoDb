@@ -16,6 +16,35 @@ namespace WebApplication1.Controllers
     [Route("test/[action]")]
     public class TestController : Controller
     {
+        public class TestResult
+        {
+            private string Name;
+            private double Right;
+
+            public void SetRight(double n)
+            {
+                Right = n;
+            }
+            public double GetRight()
+            {
+                return Right;
+            }
+            public void SetName(string n)
+            {
+                Name = n;
+            }
+            public string GetName()
+            {
+                return Name;
+            }
+        }
+
+        public class SaveResultClass
+        {
+            public string id { get; set; }
+            public string id_category { get; set; }
+            public string answer { get; set; }
+        }
         private readonly TestServices _testsService;
         private readonly CategoryServices _categoryServices;
         private readonly ResultServices _resultatservices;
@@ -55,42 +84,55 @@ namespace WebApplication1.Controllers
             return a.id_category;
         }
 
-        public async Task<Dictionary<string, double>> GetAnalysis(List<Dictionary<string, string>> result)
+        
+        public async Task<List<TestResult>> GetAnalysis(List<SaveResultClass> result)
         {
-            Dictionary <string, double> cat = new Dictionary<string, double>();
+            List<TestResult> cat2 = new List<TestResult>();
             int col = result.Count;
             foreach (var el in result)
             {
+                TestResult a = new TestResult();
+                a.SetRight(0);
                 double right = 0;
                 bool flag = false;
-                var name_ = await _categoryServices.GetAsync(el["id_category"]);
+                var name_ = await _categoryServices.GetAsync(el.id_category);
                 var name = name_.Name;
-                var q = await _questionServices.GetAsync(el["id"]);
-                if (el["answer"] == q.Answer)
+                a.SetName(name_.Name);
+                var q = await _questionServices.GetAsync(el.id);
+                if (el.answer == q.Answer)
                 {
+                    a.SetRight(1);
                     right = 1;
                 }
-                foreach (var l in cat)
+                foreach (var l in cat2)
                 {
-                    var id_c_ = await _categoryServices.GetAsync(el["id_category"]);
+                    var id_c_ = await _categoryServices.GetAsync(el.id_category);
                     var id_c = id_c_.Name;
-                    if (id_c == l.Key)
+                    if (id_c == l.GetName())
                     {
                         flag = true;
                     }
                 }
                 if (!flag)
                 {
-                    cat.Add(name,right);
+                    cat2.Add(a);
                 }
                 else
                 {
-                    cat[name] = cat[name] + right;
+                    for (int i = 0; i < cat2.Count; i++)
+                    {
+                        if (cat2[i].GetName() == name)
+                        {
+                            string new_name = cat2[i].GetName() + right;
+                            cat2[i].SetName(new_name);
+                        }
+                    }
                 }
             }
-            return cat;
+            return cat2;
         }
 
+        
         public async Task<int> GetCorrectAnswers(List<Dictionary<string, string>> result)
         {
             int col = result.Count();
@@ -106,20 +148,19 @@ namespace WebApplication1.Controllers
             }
             return right;
         }
-        public async Task<double> GetPercent(List<Dictionary<string, string>> result)
+        public async Task<double> GetPercent(List<SaveResultClass> result)
         {
             double col = result.Count();
-            double percent = 0;
             double right = 0;
             foreach (var el in result)
             {
-                var v = await _questionServices.GetAsync(el["id"]);
-                if (v.Answer == el["answer"])
+                var v = await _questionServices.GetAsync(el.id);
+                if (v.Answer == el.answer)
                 {
                     right++;
                 }
             }
-            percent = (right / col) * 100;
+            double percent = right / col * 100;
             return percent;
         }
         [HttpPost]
@@ -163,29 +204,28 @@ namespace WebApplication1.Controllers
         {
             int col = Convert.ToInt16(Request.Form["col_answer"]);
             string id_result = Request.Form["id_result"].ToString();
-            Dictionary<string, string> res = new Dictionary<string, string>();
-            List<Dictionary<string, string>> result = new List<Dictionary<string, string>>();
+            List<SaveResultClass> result = new List<SaveResultClass>();
             for (int i = 0; i < col; i++)
             {
                 string name_id = "id" + i;
                 string name_an = "q" + i;
                 string id_a = Request.Form[name_id].ToString();
                 string answer = Request.Form[name_an].ToString();
-                Dictionary<string, string> res_temp = new Dictionary<string, string>();
-                res_temp.Add("id", id_a);
-                res_temp.Add("answer", answer);
+                SaveResultClass res_temp2 = new SaveResultClass();
+                res_temp2.id = id_a;
+                res_temp2.answer = answer;
                 var val = await GetCategoryByQuestion(id_a);
-                res_temp.Add("id_category", val);
-                result.Add(res_temp);
+                res_temp2.id_category = val;
+                result.Add(res_temp2);
             }
             var res_ = await _resultatservices.GetAsync(id_result);
             var analis = await GetAnalysis(result);
-            analis.OrderBy(pair => pair.Value);
+            analis.OrderBy(pair => pair.GetRight());
             string rec = "";
             if (analis.First().ToString() != analis.Last().ToString())
             {
-                rec = "Ваша самая лучшая категория: " + analis.First().Key
-                                                             + "\n" + "Ваша самая худшая категория " + analis.Last().Key;
+                rec = "Ваша самая лучшая категория: " + analis.First().GetName()
+                                                             + "\n" + "Ваша самая худшая категория " + analis.Last().GetName();
             }
             else if(await GetPercent(result)==0)
             {
@@ -195,7 +235,13 @@ namespace WebApplication1.Controllers
             {
                 rec = "Тест пройден на " + await GetPercent(result) + "%";
             }
-            var newResult = new Result { Id = res_.Id, Value = "true", Answers = result, Id_test = res_.Id_test,Percent = await GetPercent(result), Percentage_category = analis, recommendations = rec};
+
+            Dictionary<string, double> a = new Dictionary<string, double>();
+            foreach (var el in analis)
+            {
+                a[el.GetName()] = el.GetRight();
+            }
+            var newResult = new Result { Id = res_.Id, Value = "true", Answers = result, Id_test = res_.Id_test,Percent = await GetPercent(result), Percentage_category = a, recommendations = rec};
             await _resultatservices.RemoveAsync(res_.Id);
             await _resultatservices.CreateAsync(newResult);
             return Redirect(@Url.Action("ShowResult", "Test", new { id = res_.Id }));
@@ -258,20 +304,38 @@ namespace WebApplication1.Controllers
             var a = await _resultatservices.GetAsync(newRes.Id);
             return Json(a);
         }
+
+        public class TestQuestions
+        {
+            public string Text;
+            public string Answer;
+            public string id_category;
+            public string Note;
+        }
+        public class Questions
+        {
+            public string Quantity;
+            public string Category;
+        }
         [HttpPost]
         public async Task<IActionResult> CreateTest()
         {
             List<Dictionary<string, string>> questions = new List<Dictionary<string, string>>();
+            List<Questions> questions2 = new List<Questions>();
             Dictionary<string, string> quest = new Dictionary<string,string>();
             string col = "col";
             string cat = "cat";
             for (int i = 0; i < Convert.ToInt16(Request.Form["h_col"][0]);i++)
             {
                 quest.Clear();
+                Questions quest2 = new Questions();
+                quest2.Quantity = Request.Form[col + i][0];
+                quest2.Category =Request.Form[cat + i][0];
                 quest["Quantity"] = Request.Form[col + i][0];
                 quest["Category"] = Request.Form[cat + i][0];
                 Dictionary<string, string> temp = new Dictionary<string, string>(quest);
                 questions.Add(temp);
+                questions2.Add(quest2);
             }
             for (int i = 0; i < questions.Count-1; i++)
             {
@@ -283,7 +347,18 @@ namespace WebApplication1.Controllers
                     i = -1;
                 }
             }
-            var newUser = new Test { Name = Request.Form["name"][0], Questions = questions,Time = Request.Form["time"][0]};
+
+            for (int i = 0; i < questions2.Count-1; i++)
+            {
+                if (questions2[i].Category == questions2[i + 1].Category)
+                {
+                    questions2[i].Quantity = (Convert.ToInt16(questions2[i].Quantity) +
+                                                Convert.ToInt16(questions2[i + 1].Quantity)).ToString();
+                    questions2.RemoveAt(i + 1);
+                    i = -1;
+                }
+            }
+            var newUser = new Test { Name = Request.Form["name"][0], Questions = questions2, Time = Request.Form["time"][0]};
             await _testsService.CreateAsync(newUser);
             
             return Redirect(@Url.Action("OpenTestById", "Test"));
@@ -291,7 +366,7 @@ namespace WebApplication1.Controllers
 
         public async Task<IActionResult> OpenTestById()
         {
-                var a = await _testsService.GetAsync();
+                List<Test> a = await _testsService.GetAsync();
                 var b = a;
                 return View(b);
         }
@@ -310,15 +385,9 @@ namespace WebApplication1.Controllers
             var test = await _testsService.GetAsync(id);
             foreach (var cat in test.Questions)
             {
-                foreach (var e in cat)
-                {
-                    if (e.Key == "Category")
-                    {
-                        ActionResult<string> log = await GetCategory(e.Value);
-                        string name = log.Value;
-                        ViewData[(e.Value).ToString()] = name;
-                    }
-                }
+                    ActionResult<string> log = await GetCategory(cat.Category);
+                    string name = log.Value;
+                    ViewData[(cat.Category)] = name;
             }
             return View(test);
         }
