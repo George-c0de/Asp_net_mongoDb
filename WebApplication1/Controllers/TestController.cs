@@ -220,12 +220,12 @@ namespace WebApplication1.Controllers
             }
             var res_ = await _resultatservices.GetAsync(id_result);
             var analis = await GetAnalysis(result);
-            analis.OrderBy(pair => pair.GetRight());
+            var keyValuePairs = analis.OrderBy(pair => pair.GetRight());
             string rec = "";
             if (analis.First().ToString() != analis.Last().ToString())
             {
-                rec = "Ваша самая лучшая категория: " + analis.First().GetName()
-                                                             + "\n" + "Ваша самая худшая категория " + analis.Last().GetName();
+                rec = "Ваша самая лучшая категория: " + analis.Last().GetName()
+                                                             + "\n" + "Ваша самая худшая категория " + analis.First().GetName();
             }
             else if(await GetPercent(result)==0)
             {
