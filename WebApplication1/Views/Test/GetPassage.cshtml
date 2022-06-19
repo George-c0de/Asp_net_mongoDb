@@ -64,12 +64,9 @@
 	<input name="col_answer" id="col_answer" type="hidden"/>
 	@foreach (var el in Model.Questions)
 	{
-		foreach (var e in el)
-		{
-			@if (e.Key == "Quantity")
-			{
-				<input id="coli" type="hidden" value="@e.Value"/>
-				for (int i = 0; i < Convert.ToInt16(e.Value); i++)
+		
+				<input id="coli" type="hidden" value="@el.Quantity"/>
+				for (int i = 0; i < Convert.ToInt16(el.Quantity); i++)
 				{
 					<div class="pad">
 						<label></label>
@@ -79,11 +76,7 @@
 					</div>
 					<br/>
 				}
-			}
-			@if (e.Key == "Category")
-			{
-				<input id="categ" type="hidden" value="@e.Value"/>
-			}
+				<input id="categ" type="hidden" value="@el.Category"/>
 		}
 	}
 	<button type="submit" class="btn btn-secondary">Ответить</button>

@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
+using MongoDB.Bson.Serialization.Conventions;
 using MongoDB.Driver;
 using MongoDB.Driver.GridFS;
 using WebApplication1.Models;
@@ -12,7 +13,9 @@ using WebApplication1.Services;
 var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllersWithViews();
-
+var pack = new ConventionPack();
+pack.Add(new IgnoreExtraElementsConvention(true));
+ConventionRegistry.Register("My Solution Conventions", pack, t => true);
 
 // Add services to the container.
 builder.Services.Configure<DatabaseSettings>(

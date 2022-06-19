@@ -66,7 +66,7 @@ namespace TestProject
             // Act
             TestController controller = new TestController(testsService, categoryServices,
                 resultServices, questionServices);
-            List<Dictionary<string, string>> result1 = new List<Dictionary<string, string>>();
+            List<TestController.SaveResultClass> result1 = new List<TestController.SaveResultClass>();
             Dictionary<string, string> res_temp = new Dictionary<string, string>();
             res_temp.Add("id", "12345678910111");
             res_temp.Add("answer", "answer");
@@ -96,12 +96,11 @@ namespace TestProject
         {
             //Arrange
             TestServices testsService = new TestServices(Connect());
-            List<Dictionary<string, string>> Questions = new List<Dictionary<string, string>>();
-            Dictionary<string, string> Question = new Dictionary<string, string>();
-            Question["Text"] = "MyTest";
-            Question["Answer"] = "MyAnswer"; 
-            Question["id_category"] = "14characters14"; 
-            Question["Note"] = "not";
+            List<TestController.Questions> Questions = new List<TestController.Questions>();
+
+            TestController.Questions Question = new TestController.Questions();
+            Question.Category = "MyTest";
+            Question.Quantity = "MyAnswer"; 
             Questions.Add(Question);
             Test result = new Test()
             {
@@ -124,7 +123,7 @@ namespace TestProject
             {
                 Text = "MyTest",
                 Answer = "MyAnswer",
-                id_category = "14characters14",
+                id_category = "14characters144",
                 Note = "not",
             };
             await questionServices.CreateAsync(question);
