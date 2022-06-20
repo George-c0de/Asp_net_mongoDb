@@ -1,6 +1,7 @@
 ﻿using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
 using WebApplication1.Models;
 using WebApplication1.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -38,7 +39,73 @@ public class UsersController : Controller
     {
         return View();
     }
+    [HttpGet]
+    [AllowAnonymous]
+    public IActionResult ForgotPassword()
+    {
+        return View();
+    }
+    [HttpPost]
+    [AllowAnonymous]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> ForgotPassword([FromForm] ForgotPasswordViewModel model)
+    {
+        if (ModelState.IsValid)
+        {
+            var users = await _usersService.GetAsync();
+            Users user = null;
+            foreach (var el in users)
+            {
+                if (el.Name == model.Login)
+                {
+                    user = el;
+                }
+            }
+            if (user == null)
+            {
+                // пользователь с данным email может отсутствовать в бд
+                // тем не менее мы выводим стандартное сообщение, чтобы скрыть 
+                // наличие или отсутствие пользователя в бд
+                return View("Message");
+            }
 
+            var url = Url.Action("ResetPassword", "Users", new { userId = user.Id });
+            return Redirect(url);
+        }
+        return View(model);
+    }
+    [HttpGet]
+    [AllowAnonymous]
+    public IActionResult ResetPassword()
+    {
+        return View();
+    }
+    [HttpPost]
+    [AllowAnonymous]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> ResetPassword([FromForm] ResetPasswordViewModel model)
+    {
+        if (!ModelState.IsValid)
+        {
+            return View(model);
+        }
+        var users = await _usersService.GetAsync();
+        Users user = null;
+        foreach (var el in users)
+        {
+            if (el.Name == model.Login)
+            {
+                user = el;
+            }
+        }
+        if (user == null)
+        {
+            return View("Message");
+        }
+        user.Password = model.Password;
+        await _usersService.UpdateAsync(user.Id, user);
+        return View();
+    }
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Register([FromForm] RegisterModel model)

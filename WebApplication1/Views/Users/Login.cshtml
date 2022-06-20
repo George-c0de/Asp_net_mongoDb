@@ -9,6 +9,11 @@
 		align-content: center; 
 		justify-content: center; 
 	}
+	a[id="ro"] {
+		margin-bottom: 100px;
+		margin-left: 10px;
+		width: 150px;
+	}
 	label {
 		margin: 10px;
 		width: 150px;
@@ -46,8 +51,10 @@
 			<input  asp-for="Password"/>
 			<span asp-validation-for="Password"/>
 		</div>
+		<a href="/api/ForgotPassword" id="ro">Забыли пароль ?</a>
 		<div class="form-group">
 			<input id="bt_login" type="submit" value="Войти" class="btn btn-outline-dark"/>
 		</div>
+		
 	</div>
 </form>
