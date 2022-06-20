@@ -49,13 +49,15 @@ namespace WebApplication1.Controllers
         private readonly CategoryServices _categoryServices;
         private readonly ResultServices _resultatservices;
         private readonly QuestionsServices _questionServices;
+        private readonly EmailMessageSender _emailServices;
         public TestController(TestServices testsService, CategoryServices categoryServices,
-            ResultServices resultServices, QuestionsServices questionServices)
+            ResultServices resultServices, QuestionsServices questionServices,EmailMessageSender emailServices)
         {
             _resultatservices = resultServices;
             _testsService = testsService;
             _categoryServices = categoryServices;
             _questionServices = questionServices;
+            _emailServices = emailServices;
         }
         [HttpGet]
         public async Task<IActionResult> Create()
@@ -167,35 +169,13 @@ namespace WebApplication1.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> SendMessage()
         {
-            MailAddress from = new MailAddress("Test_Company@gmail.com", "Test_Company");
-            //komy
-            MailAddress to = new MailAddress(Request.Form["email"]);
-            MailMessage m = new MailMessage(from, to);
-            // тема письма
-            m.Subject = "Тест";
-            // текст письма
-            string body;
-            var t = await _resultatservices.GetAsync(Request.Form["id"]);
+
+            string email = Request.Form["email"];
+            string id = Request.Form["id"];
+            Result t = await _resultatservices.GetAsync(id);
             var test_ = await _testsService.GetAsync(t.Id_test);
             var test = test_.Name;
-            body = "<h5>" + test + "</h5>";
-            body += "<p>" + "Количество правильных ответов по категориям" + "</p>";
-            foreach (var el in t.Percentage_category)
-            {
-                body +="<p>"+"Категория: " + el.Key + " : " +el.Value + "</p>";
-            }
-            body+= "<p>" + "Доля правильных ответов" + t.Percent + "</p>";
-            body+= "<p>" + "Ваши рекомендации" + "</p>";
-            body+= "<p>" + t.recommendations + "</p>";
-            m.Body = body;
-            // письмо представляет код html
-            m.IsBodyHtml = true;
-            // адрес smtp-сервера и порт, с которого будем отправлять письмо
-            SmtpClient smtp = new SmtpClient("smtp.gmail.com", 587);
-            // логин и пароль
-            smtp.Credentials = new NetworkCredential("Test_Company@gmail.com", "mypassword");
-            smtp.EnableSsl = true;
-            smtp.Send(m);
+            _emailServices.Send(email,id,t, test);
             return Redirect("");
         }
         [HttpPost]

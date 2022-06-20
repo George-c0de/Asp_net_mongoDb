@@ -26,6 +26,7 @@ builder.Services.AddSingleton<TestServices>();
 builder.Services.AddSingleton<CategoryServices>();
 builder.Services.AddSingleton<QuestionsServices>();
 builder.Services.AddSingleton<ResultServices>();
+builder.Services.AddSingleton<EmailMessageSender>();
 //IMongoCollection<Users> Users; // коллекция в базе данных
 //IGridFSBucket gridFS;
 //////MongoDB
