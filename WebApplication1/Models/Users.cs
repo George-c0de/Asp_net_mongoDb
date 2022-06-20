@@ -19,6 +19,9 @@ namespace WebApplication1.Models
 
         [Display(Name = "Пароль")]
         public string Password { get; set; }
-
+        [Display(Name = "Email")]
+        public string Email { get; set; }
+        [Display(Name = "Token")]
+        public string? Token { get; set; }
     }
 }

@@ -56,29 +56,35 @@ public class UsersController : Controller
             Users user = null;
             foreach (var el in users)
             {
-                if (el.Name == model.Login)
+                if (el.Email == model.Email)
                 {
                     user = el;
                 }
             }
             if (user == null)
             {
-                // пользователь с данным email может отсутствовать в бд
-                // тем не менее мы выводим стандартное сообщение, чтобы скрыть 
-                // наличие или отсутствие пользователя в бд
                 return View("Message");
             }
 
-            var url = Url.Action("ResetPassword", "Users", new { userId = user.Id });
-            return Redirect(url);
+            var code = await _usersService.GetToken(user.Id);
+            var callbackUrl = Url.Action("ResetPassword", "Users", new { userId = user.Id, code = code }, protocol: HttpContext.Request.Scheme);
+            /*
+            Здесь отправка по email, так как ветка без предыдущего пула
+             * EmailService emailService = new EmailService();
+            await emailService.SendEmailAsync(model.Email, "Reset Password",
+                $"Для сброса пароля пройдите по ссылке: <a href='{callbackUrl}'>link</a>");
+             пока просто редирект
+             */
+            return Redirect(Url.Action("ResetPassword","Users", new { userId = user.Id, code = code }, protocol: HttpContext.Request.Scheme));
+            return View("ForgotPasswordConfirmation");
         }
         return View(model);
     }
     [HttpGet]
     [AllowAnonymous]
-    public IActionResult ResetPassword()
+    public IActionResult ResetPassword(string code = null)
     {
-        return View();
+        return code == null ? View("Error") : View();
     }
     [HttpPost]
     [AllowAnonymous]
@@ -93,18 +99,19 @@ public class UsersController : Controller
         Users user = null;
         foreach (var el in users)
         {
-            if (el.Name == model.Login)
+            if (el.Token == model.Code)
             {
                 user = el;
             }
         }
         if (user == null)
         {
-            return View("Message");
+            return View("Error403");
         }
         user.Password = model.Password;
+        user.Token = null;
         await _usersService.UpdateAsync(user.Id, user);
-        return View();
+        return View("Successfully");
     }
     [HttpPost]
     [ValidateAntiForgeryToken]
@@ -123,9 +130,9 @@ public class UsersController : Controller
                 }
             }
             // добавляем пользователя в бд
-            var newUser = new Users {Name = model.Name, Password = model.Password, Surname = ""};
+            var newUser = new Users {Name = model.Name, Password = model.Password, Surname = "", Email = model.Email};
             await _usersService.CreateAsync(newUser);
-            return CreatedAtAction(nameof(Get), new { id = newUser.Id }, newUser);
+            return Redirect(Url.Action("Login","Users"));
         }
         return View(model);
     }
