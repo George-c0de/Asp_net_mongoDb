@@ -21,6 +21,24 @@ namespace WebApplication1.Services
                 DatabaseSettings.Value.UsersCollectionName);
         }
 
+        public async Task<string> GetToken(string id)
+        {
+            char[] letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890".ToCharArray();
+            Random rand = new Random();
+            string lstWords;
+                string word = "";
+                for (int j = 1; j <= 24; j++)
+                {
+                    int letter_num = rand.Next(0, letters.Length - 1);
+                    word += letters[letter_num];
+                }
+                lstWords = word;
+                var a = await _usersCollection.Find(x => x.Id == id).FirstOrDefaultAsync();
+                Users user = a;
+                user.Token = lstWords;
+                await UpdateAsync(a.Id,user);
+                return (lstWords);
+        } 
         public async Task<List<Users>> GetAsync() =>
             await _usersCollection.Find(_ => true).ToListAsync();
 
