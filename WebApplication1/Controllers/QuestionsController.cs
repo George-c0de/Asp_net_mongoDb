@@ -15,11 +15,15 @@ namespace WebApplication1.Controllers
     {
         private readonly QuestionsServices _questionsService;
         private readonly CategoryServices _categoryService;
+        private readonly UsersService _usersService;
 
-        public QuestionsController(QuestionsServices questionsService, CategoryServices categoryService)
+
+        public QuestionsController(QuestionsServices questionsService, 
+            CategoryServices categoryService, UsersService usersService)
         {
             _categoryService = categoryService;
             _questionsService = questionsService;
+            _usersService = usersService;
         }
 
         [HttpGet("{id:length(24)}")]
@@ -49,16 +53,36 @@ namespace WebApplication1.Controllers
             }
             return Json(a);
         }
-
-        [HttpGet]
-        public IActionResult Get(string id)
+        public async Task<bool> CheckUser()
         {
+            var user_name = User.Identity.Name;
+            var users = await _usersService.GetAsync();
+            foreach (var el in users)
+            {
+                if (el.Name == user_name && el.Role != "admin")
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+        [HttpGet]
+        public async Task<IActionResult> Get(string id)
+        {
+            if (await CheckUser())
+            {
+                return StatusCode(403);
+            }
             ViewData["id"] = id;
             return View();
         }
         [HttpPost]
         public async Task<IActionResult> Create([FromForm] QuestionsModel model)
         {
+            if (await CheckUser())
+            {
+                return StatusCode(403);
+            }
             if (Request != null)
             {
                 Request.ContentType = "application/json";
@@ -81,7 +105,7 @@ namespace WebApplication1.Controllers
                 {
                     note_ = model.Note;
                 }
-                var newQuestion = new Question { Text = model.Text, Answer = model.Answer, Note = note_, id_category = model.id_category };
+                var newQuestion = new Question { Text = model.Text, Answer = model.Answer, Note = note_, id_category = model.id_category, Complexity = model.Complexity };
                 await _questionsService.CreateAsync(newQuestion);
             }
 
@@ -93,6 +117,10 @@ namespace WebApplication1.Controllers
         }
         public async Task<ActionResult> Details()
         {
+            if (await CheckUser())
+            {
+                return StatusCode(403);
+            }
             var question = await _questionsService.GetAsync();
             foreach (var el in question)
             {

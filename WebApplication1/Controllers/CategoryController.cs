@@ -13,21 +13,46 @@ namespace WebApplication1.Controllers
     {
         private readonly CategoryServices _categoryServices;
         private readonly QuestionsServices _questionServices;
+        private readonly UsersService _usersService;
 
-        public CategoryController(CategoryServices categoryServices, QuestionsServices questionServices)
+        public CategoryController(
+            CategoryServices categoryServices, QuestionsServices questionServices, 
+            UsersService usersService)
         {
+            _usersService = usersService;
             _categoryServices = categoryServices;
             _questionServices = questionServices;
         }
-        [HttpGet]
-        public IActionResult Create()
+        public async Task<bool> CheckUser()
         {
+            var user_name = User.Identity.Name;
+            var users = await _usersService.GetAsync();
+            foreach (var el in users)
+            {
+                if (el.Name == user_name && el.Role != "admin")
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+        [HttpGet]
+        public async Task<IActionResult> Create()
+        {
+            if (await CheckUser())
+            {
+                return StatusCode(403);
+            }
             return View();
         }
         [HttpPost]
         public async Task<IActionResult> Create([FromForm] CategoryModel model)
         {
-            if(Request != null)
+            if (await CheckUser())
+            {
+                return StatusCode(403);
+            }
+            if (Request != null)
                 Request.ContentType = "application/json";
             if (ModelState.IsValid)
             {
@@ -45,6 +70,10 @@ namespace WebApplication1.Controllers
         [HttpGet]
         public async Task<IActionResult> Index()
         {
+            if (await CheckUser())
+            {
+                return StatusCode(403);
+            }
             var a = await _categoryServices.GetAsync();
             var b = a;
             return View(b);

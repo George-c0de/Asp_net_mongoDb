@@ -35,7 +35,7 @@ namespace WebApplication1.Services
                 lstWords = word;
                 var a = await _usersCollection.Find(x => x.Id == id).FirstOrDefaultAsync();
                 Users user = a;
-                user.Token = lstWords;
+                user.Token = Guid.NewGuid().ToString("N");
                 await UpdateAsync(a.Id,user);
                 return (lstWords);
         } 

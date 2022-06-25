@@ -9,9 +9,9 @@
 
         public List<Dictionary<string, string>> Answers { get; set; }
 
-        public Dictionary<string, double> Percentage_category { get; set; }
+        public Dictionary<string, int> Percentage_category { get; set; }
 
-        public double Percent { get; set; }
+        public int Percent { get; set; }
 
         public string recommendations { get; set; }
     }

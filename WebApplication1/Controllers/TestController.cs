@@ -8,7 +8,6 @@ using WebApplication1.ViewModels;
 using Controller = Microsoft.AspNetCore.Mvc.Controller;
 using JsonResult = Microsoft.AspNetCore.Mvc.JsonResult;
 using Microsoft.AspNetCore.Authorization;
-
 namespace WebApplication1.Controllers
 {
     [ApiController]
@@ -38,7 +37,19 @@ namespace WebApplication1.Controllers
                 return Name;
             }
         }
-
+        public async Task<bool> CheckUser()
+        {
+            var user_name = User.Identity.Name;
+            var users = await _usersService.GetAsync();
+            foreach (var el in users)
+            {
+                if (el.Name == user_name && el.Role != "admin")
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
         public class SaveResultClass
         {
             public string id { get; set; }
@@ -50,18 +61,29 @@ namespace WebApplication1.Controllers
         private readonly ResultServices _resultatservices;
         private readonly QuestionsServices _questionServices;
         private readonly EmailMessageSender _emailServices;
-        public TestController(TestServices testsService, CategoryServices categoryServices,
-            ResultServices resultServices, QuestionsServices questionServices,EmailMessageSender emailServices)
+        private readonly UsersService _usersService;
+        public TestController(
+            TestServices testsService, CategoryServices categoryServices,
+            ResultServices resultServices, QuestionsServices questionServices,
+            EmailMessageSender emailServices, UsersService usersService
+            )
         {
+            _usersService = usersService;
             _resultatservices = resultServices;
             _testsService = testsService;
             _categoryServices = categoryServices;
             _questionServices = questionServices;
             _emailServices = emailServices;
         }
+
+        
         [HttpGet]
         public async Task<IActionResult> Create()
         {
+            if (await CheckUser())
+            {
+                return StatusCode(403);
+            }
             var category = await _categoryServices.GetAsync();
             
             return View(category);
@@ -138,13 +160,22 @@ namespace WebApplication1.Controllers
         public async Task<int> GetCorrectAnswers(List<Dictionary<string, string>> result)
         {
             int col = result.Count();
-            double percent = 0;
+            int percent = 0;
             int right = 0;
             foreach (var el in result)
             {
                 var v = await _questionServices.GetAsync(el["id"]);
                 if (v.Answer == el["answer"])
                 {
+                    if (v.Complexity =="средний")
+                    {
+                        right *= 2;
+                    }
+
+                    if (v.Complexity == "высокий")
+                    {
+
+                    }
                     right++;
                 }
             }
@@ -152,8 +183,8 @@ namespace WebApplication1.Controllers
         }
         public async Task<double> GetPercent(List<SaveResultClass> result)
         {
-            double col = result.Count();
-            double right = 0;
+            int col = result.Count();
+            int right = 0;
             foreach (var el in result)
             {
                 var v = await _questionServices.GetAsync(el.id);
@@ -162,7 +193,7 @@ namespace WebApplication1.Controllers
                     right++;
                 }
             }
-            double percent = right / col * 100;
+            int percent = right / col * 100;
             return percent;
         }
         [HttpPost]
@@ -303,6 +334,10 @@ namespace WebApplication1.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateTest()
         {
+            if (await CheckUser())
+            {
+                return StatusCode(403);
+            }
             List<Dictionary<string, string>> questions = new List<Dictionary<string, string>>();
             List<Questions> questions2 = new List<Questions>();
             Dictionary<string, string> quest = new Dictionary<string,string>();
@@ -365,6 +400,10 @@ namespace WebApplication1.Controllers
         [Microsoft.AspNetCore.Mvc.HttpGet("{id:length(24)}")]
         public async Task<ActionResult<string>> CreateCodeForTest(string id)
         {
+            if (await CheckUser())
+            {
+                return StatusCode(403);
+            }
             var test = await _testsService.GetAsync(id);
             foreach (var cat in test.Questions)
             {
@@ -378,6 +417,10 @@ namespace WebApplication1.Controllers
         [Microsoft.AspNetCore.Mvc.HttpGet]
         public async Task<ActionResult<string>> GetCategory(string id)
         {
+            if (await CheckUser())
+            {
+                return StatusCode(403);
+            }
             var category = await _categoryServices.GetAsync(id);
             if (category is null)
             {

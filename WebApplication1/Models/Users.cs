@@ -23,5 +23,7 @@ namespace WebApplication1.Models
         public string Email { get; set; }
         [Display(Name = "Token")]
         public string? Token { get; set; }
+        [Display(Name = "Роль")]
+        public string? Role { get; set; }
     }
 }
