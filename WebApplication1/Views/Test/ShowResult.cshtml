@@ -130,7 +130,7 @@
 		<p class="test-list__page__p">Количество правильных ответов по категориям</p>
 		@foreach (var el in @Model.Percentage_category)
 		{
-			<p class="test-list__test__title"> <strong>Категория: </strong>@el.Key : @el.Value</p>
+			<p class="test-list__test__title"> <strong>Категория: </strong>@el.Key</p>
 		}
 		<p class="test-list__page__p">Доля правильных ответов @Model.Percent%</p>
 	<p class="test-list__page__p2">Ваши рекомендации</p>

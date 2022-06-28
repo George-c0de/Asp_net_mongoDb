@@ -8,6 +8,8 @@ using WebApplication1.ViewModels;
 using Controller = Microsoft.AspNetCore.Mvc.Controller;
 using JsonResult = Microsoft.AspNetCore.Mvc.JsonResult;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.VisualBasic;
+
 namespace WebApplication1.Controllers
 {
     [ApiController]
@@ -125,8 +127,18 @@ namespace WebApplication1.Controllers
                 var q = await _questionServices.GetAsync(el.id);
                 if (el.answer == q.Answer)
                 {
-                    a.SetRight(1);
-                    right = 1;
+                    
+                    if (q.Complexity=="средний")
+                    {
+                        right = 2;
+                    }
+                    else if (q.Complexity == "высокий")
+                    {
+                        right = 3;
+                    }
+                    else
+                        right = 1;
+                    a.SetRight(right);
                 }
                 foreach (var l in cat2)
                 {
@@ -183,8 +195,8 @@ namespace WebApplication1.Controllers
         }
         public async Task<double> GetPercent(List<SaveResultClass> result)
         {
-            int col = result.Count();
-            int right = 0;
+            double col = result.Count();
+            double right = 0;
             foreach (var el in result)
             {
                 var v = await _questionServices.GetAsync(el.id);
@@ -193,7 +205,7 @@ namespace WebApplication1.Controllers
                     right++;
                 }
             }
-            int percent = right / col * 100;
+            double percent = right / col * 100;
             return percent;
         }
         [HttpPost]
@@ -233,21 +245,28 @@ namespace WebApplication1.Controllers
             var analis = await GetAnalysis(result);
 
             var keyValuePairs = analis.OrderBy(pair => pair.GetRight());
+            double temp_per = await GetPercent(result);
+            double percent = Math.Round(temp_per, 2);
+            string rec;
+            if (keyValuePairs.Count() != 1 && percent!=0)
+            {
+                rec = "Мы рекомендуем вам поступать на " + keyValuePairs.Last().GetName();
 
-            string rec = "";
-            if (keyValuePairs.First().ToString() != keyValuePairs.Last().ToString())
-            {
-                
-                rec = "Ваша самая лучшая категория: " + keyValuePairs.Last().GetName()
-                                                      + "\n" + "Ваша самая худшая категория " + keyValuePairs.First().GetName();
             }
-            else if(await GetPercent(result)==0)
+            else if(percent == 0)
             {
-                rec = "Тест завален";
+                rec = "Тест пройден на 0%\nТемы, которые стоит повторить:\n";
+                foreach (var el in keyValuePairs)
+                {
+                    rec += el.GetName();
+                    rec += ", ";
+                }
             }
             else
             {
-                rec = "Тест пройден на " + await GetPercent(result) + "%";
+                rec = "Тест пройден на " + percent + "%";
+                rec += ". Мы рекомендуем вам поступать на " + keyValuePairs.Last().GetName();
+
             }
 
             Dictionary<string, double> a = new Dictionary<string, double>();
@@ -255,7 +274,7 @@ namespace WebApplication1.Controllers
             {
                 a[el.GetName()] = el.GetRight();
             }
-            var newResult = new Result { Id = res_.Id, Value = "true", Answers = result, Id_test = res_.Id_test,Percent = await GetPercent(result), Percentage_category = a, recommendations = rec};
+            var newResult = new Result { Id = res_.Id, Value = "true", Answers = result, Id_test = res_.Id_test,Percent = percent, Percentage_category = a, recommendations = rec};
             await _resultatservices.RemoveAsync(res_.Id);
             await _resultatservices.CreateAsync(newResult);
             return Redirect(@Url.Action("ShowResult", "Test", new { id = res_.Id }));
