@@ -159,7 +159,7 @@ namespace WebApplication1.Controllers
                     {
                         if (cat2[i].GetName() == name)
                         {
-                            string new_name = cat2[i].GetName() + right;
+                            string new_name = cat2[i].GetName();
                             cat2[i].SetName(new_name);
                         }
                     }
