@@ -1,4 +1,4 @@
-name: Asp_net_mongoDb
+name: Asp_net_mongoDb_main
 
 on: [push]
 
@@ -17,14 +17,4 @@ jobs:
         with:
           dotnet-version: '6.0.x'
           include-prerelease: true
-      - name: Install dependencies
-        run: dotnet restore
-      - name: Build
-        run: dotnet build --configuration Release --no-restore
-      - name: Test
-        run: dotnet test --no-restore --verbosity normal
-
-branding:
-icon: play
-color: green
- 
+      - uses: run_tests
