@@ -1,10 +1,5 @@
-name: Asp_net_mongoDb
-        
-
-branding:
-  icon: play
-  color: green
- 
+name: Asp_net_mongoDb 
+  
 on: [push]
 
 jobs:
