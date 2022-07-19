@@ -45,9 +45,11 @@ namespace TestProject
             CategoryServices categoryServices = new CategoryServices(Connect());
             ResultServices resultServices = new ResultServices(Connect());
             QuestionsServices questionServices = new QuestionsServices(Connect());
+            UsersService userService = new UsersService(Connect());
+            EmailMessageSender emailServices = new EmailMessageSender();
             // Act
             TestController controller = new TestController(testsService, categoryServices,
-                resultServices, questionServices);
+                resultServices, questionServices, emailServices, userService);
             var a = await resultServices.GetAsync();
             var b = a.Last();
             var result = await controller.ShowResult(b.Id) as ViewResult;
@@ -63,9 +65,11 @@ namespace TestProject
             CategoryServices categoryServices = new CategoryServices(Connect());
             ResultServices resultServices = new ResultServices(Connect());
             QuestionsServices questionServices = new QuestionsServices(Connect());
+            UsersService userService = new UsersService(Connect());
+            EmailMessageSender emailServices = new EmailMessageSender();
             // Act
             TestController controller = new TestController(testsService, categoryServices,
-                resultServices, questionServices);
+                resultServices, questionServices, emailServices, userService);
             List<TestController.SaveResultClass> result1 = new List<TestController.SaveResultClass>();
             Dictionary<string, string> res_temp = new Dictionary<string, string>();
             res_temp.Add("id", "12345678910111");
@@ -82,7 +86,8 @@ namespace TestProject
            // Arrange
            CategoryServices categoryServices = new CategoryServices(Connect());
            QuestionsServices questionServices = new QuestionsServices(Connect());
-           CategoryController controller = new CategoryController(categoryServices, questionServices);
+           UsersService userService = new UsersService(Connect());
+           CategoryController controller = new CategoryController(categoryServices, questionServices, userService);
            CategoryModel model = new CategoryModel();
            model.Name = "1";
            // Act
