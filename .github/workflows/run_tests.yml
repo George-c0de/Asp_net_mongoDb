@@ -2,8 +2,8 @@ name: Asp_net_mongoDb
         
 
 branding:
-icon: play
-color: green
+  icon: play
+  color: green
  
 on: [push]
 
