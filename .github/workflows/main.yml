@@ -3,6 +3,7 @@ name: Asp_net_mongoDb
 on: [push]
 
 jobs:
+  
   build:
 
     runs-on: ubuntu-latest
@@ -22,3 +23,8 @@ jobs:
         run: dotnet build --configuration Release --no-restore
       - name: Test
         run: dotnet test --no-restore --verbosity normal
+
+branding:
+ icon: play
+  color: green
+ 
