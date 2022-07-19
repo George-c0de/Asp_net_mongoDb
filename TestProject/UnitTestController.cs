@@ -77,7 +77,7 @@ namespace TestProject
             res_temp.Add("id_category", "12345678910111");
             var result = await controller.GetAnalysis(result1);
             // Assert
-            Assert.IsType<Dictionary<string, double>>(result);
+            Assert.IsType<List<TestController.TestResult>>(result);
         }
 
         [Fact]
