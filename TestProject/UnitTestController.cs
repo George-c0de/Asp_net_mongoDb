@@ -37,59 +37,59 @@ namespace TestProject
             return _config;
         }
 
-        [Fact]
-        public async void TestViewResultNotNull()
-        {
-            // Arrange
-            TestServices testsService = new TestServices(Connect());
-            CategoryServices categoryServices = new CategoryServices(Connect());
-            ResultServices resultServices = new ResultServices(Connect());
-            QuestionsServices questionServices = new QuestionsServices(Connect());
-            // Act
-            TestController controller = new TestController(testsService, categoryServices,
-                resultServices, questionServices);
-            var a = await resultServices.GetAsync();
-            var b = a.Last();
-            var result = await controller.ShowResult(b.Id) as ViewResult;
-            // Assert
-            Assert.IsType<Result>(result.Model);
-        }
+        //[Fact]
+        //public async void TestViewResultNotNull()
+        //{
+        //    // Arrange
+        //    TestServices testsService = new TestServices(Connect());
+        //    CategoryServices categoryServices = new CategoryServices(Connect());
+        //    ResultServices resultServices = new ResultServices(Connect());
+        //    QuestionsServices questionServices = new QuestionsServices(Connect());
+        //    // Act
+        //    TestController controller = new TestController(testsService, categoryServices,
+        //        resultServices, questionServices);
+        //    var a = await resultServices.GetAsync();
+        //    var b = a.Last();
+        //    var result = await controller.ShowResult(b.Id) as ViewResult;
+        //    // Assert
+        //    Assert.IsType<Result>(result.Model);
+        //}
 
-        [Fact]
-        public async void GetAnalysis()
-        {
-            // Arrange
-            TestServices testsService = new TestServices(Connect());
-            CategoryServices categoryServices = new CategoryServices(Connect());
-            ResultServices resultServices = new ResultServices(Connect());
-            QuestionsServices questionServices = new QuestionsServices(Connect());
-            // Act
-            TestController controller = new TestController(testsService, categoryServices,
-                resultServices, questionServices);
-            List<TestController.SaveResultClass> result1 = new List<TestController.SaveResultClass>();
-            Dictionary<string, string> res_temp = new Dictionary<string, string>();
-            res_temp.Add("id", "12345678910111");
-            res_temp.Add("answer", "answer");
-            res_temp.Add("id_category", "12345678910111");
-            var result = await controller.GetAnalysis(result1);
-            // Assert
-            Assert.IsType<Dictionary<string, double>>(result);
-        }
+        //[Fact]
+        //public async void GetAnalysis()
+        //{
+        //    // Arrange
+        //    TestServices testsService = new TestServices(Connect());
+        //    CategoryServices categoryServices = new CategoryServices(Connect());
+        //    ResultServices resultServices = new ResultServices(Connect());
+        //    QuestionsServices questionServices = new QuestionsServices(Connect());
+        //    // Act
+        //    TestController controller = new TestController(testsService, categoryServices,
+        //        resultServices, questionServices);
+        //    List<TestController.SaveResultClass> result1 = new List<TestController.SaveResultClass>();
+        //    Dictionary<string, string> res_temp = new Dictionary<string, string>();
+        //    res_temp.Add("id", "12345678910111");
+        //    res_temp.Add("answer", "answer");
+        //    res_temp.Add("id_category", "12345678910111");
+        //    var result = await controller.GetAnalysis(result1);
+        //    // Assert
+        //    Assert.IsType<Dictionary<string, double>>(result);
+        //}
 
-        [Fact]
-        public async void CreateCategory()
-        {
-            // Arrange
-            CategoryServices categoryServices = new CategoryServices(Connect());
-            QuestionsServices questionServices = new QuestionsServices(Connect());
-            CategoryController controller = new CategoryController(categoryServices, questionServices);
-            CategoryModel model = new CategoryModel();
-            model.Name = "1";
-            // Act
-            var result = await controller.Create(model) as RedirectResult;
-            // Assert
-            Assert.Equal("/category/Index", result?.Url);
-        }
+        //[Fact]
+        //public async void CreateCategory()
+        //{
+        //    // Arrange
+        //    CategoryServices categoryServices = new CategoryServices(Connect());
+        //    QuestionsServices questionServices = new QuestionsServices(Connect());
+        //    CategoryController controller = new CategoryController(categoryServices, questionServices);
+        //    CategoryModel model = new CategoryModel();
+        //    model.Name = "1";
+        //    // Act
+        //    var result = await controller.Create(model) as RedirectResult;
+        //    // Assert
+        //    Assert.Equal("/category/Index", result?.Url);
+        //}
 
         [Fact]
         public async void CreateTest()
