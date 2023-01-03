@@ -4,11 +4,12 @@ using System.Net.Mail;
 using Microsoft.AspNetCore.Mvc;
 using WebApplication1.Models;
 using WebApplication1.Services;
-using WebApplication1.ViewModels;
 using Controller = Microsoft.AspNetCore.Mvc.Controller;
 using JsonResult = Microsoft.AspNetCore.Mvc.JsonResult;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.VisualBasic;
+using WebApplication1.ViewModels;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace WebApplication1.Controllers
 {
@@ -52,6 +53,9 @@ namespace WebApplication1.Controllers
             }
             return false;
         }
+
+     
+
         public class SaveResultClass
         {
             public string id { get; set; }
@@ -78,7 +82,7 @@ namespace WebApplication1.Controllers
             _emailServices = emailServices;
         }
 
-        
+
         [HttpGet]
         public async Task<IActionResult> Create()
         {
@@ -87,7 +91,7 @@ namespace WebApplication1.Controllers
                 return StatusCode(403);
             }
             var category = await _categoryServices.GetAsync();
-            
+
             return View(category);
         }
 
@@ -110,7 +114,7 @@ namespace WebApplication1.Controllers
             return a.id_category;
         }
 
-        
+
         public async Task<List<TestResult>> GetAnalysis(List<SaveResultClass> result)
         {
             List<TestResult> cat2 = new List<TestResult>();
@@ -127,8 +131,8 @@ namespace WebApplication1.Controllers
                 var q = await _questionServices.GetAsync(el.id);
                 if (el.answer == q.Answer)
                 {
-                    
-                    if (q.Complexity=="средний")
+
+                    if (q.Complexity == "средний")
                     {
                         right = 2;
                     }
@@ -159,7 +163,7 @@ namespace WebApplication1.Controllers
                     {
                         if (cat2[i].GetName() == name)
                         {
-                            string new_name = cat2[i].GetName();
+                            string new_name = cat2[i].GetName() + right;
                             cat2[i].SetName(new_name);
                         }
                     }
@@ -168,7 +172,7 @@ namespace WebApplication1.Controllers
             return cat2;
         }
 
-        
+
         public async Task<int> GetCorrectAnswers(List<Dictionary<string, string>> result)
         {
             int col = result.Count();
@@ -179,7 +183,7 @@ namespace WebApplication1.Controllers
                 var v = await _questionServices.GetAsync(el["id"]);
                 if (v.Answer == el["answer"])
                 {
-                    if (v.Complexity =="средний")
+                    if (v.Complexity == "средний")
                     {
                         right *= 2;
                     }
@@ -212,14 +216,13 @@ namespace WebApplication1.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> SendMessage()
         {
-
             string email = Request.Form["email"];
             string id = Request.Form["id"];
             Result t = await _resultatservices.GetAsync(id);
             var test_ = await _testsService.GetAsync(t.Id_test);
             var test = test_.Name;
-            _emailServices.Send(email,id,t, test);
-            return Redirect("");
+            _emailServices.Send(email, id, t, test);
+            return Redirect("/test/OpenTestById");
         }
         [HttpPost]
         [AllowAnonymous]
@@ -248,12 +251,12 @@ namespace WebApplication1.Controllers
             double temp_per = await GetPercent(result);
             double percent = Math.Round(temp_per, 2);
             string rec;
-            if (keyValuePairs.Count() != 1 && percent!=0)
+            if (keyValuePairs.Count() != 1 && percent ==100)
             {
-                rec = "Мы рекомендуем вам поступать на " + keyValuePairs.Last().GetName();
+                rec = "Мы рекомендуем вам выбрать свою профессию, так как вы сдали на 100%!" ;
 
             }
-            else if(percent == 0)
+            else if (percent == 0)
             {
                 rec = "Тест пройден на 0%\nТемы, которые стоит повторить:\n";
                 foreach (var el in keyValuePairs)
@@ -268,13 +271,13 @@ namespace WebApplication1.Controllers
                 rec += ". Мы рекомендуем вам поступать на " + keyValuePairs.Last().GetName();
 
             }
-
+            ViewBag.Re = analis;
             Dictionary<string, double> a = new Dictionary<string, double>();
             foreach (var el in analis)
             {
                 a[el.GetName()] = el.GetRight();
             }
-            var newResult = new Result { Id = res_.Id, Value = "true", Answers = result, Id_test = res_.Id_test,Percent = percent, Percentage_category = a, recommendations = rec};
+            var newResult = new Result { Id = res_.Id, Value = "true", Answers = result, Id_test = res_.Id_test, Percent = percent, Percentage_category = a, recommendations = rec };
             await _resultatservices.RemoveAsync(res_.Id);
             await _resultatservices.CreateAsync(newResult);
             return Redirect(@Url.Action("ShowResult", "Test", new { id = res_.Id }));
@@ -287,6 +290,7 @@ namespace WebApplication1.Controllers
             var analis = await _resultatservices.GetAsync(id);
             var name_ = await _testsService.GetAsync(analis.Id_test);
             var name = name_.Name;
+			ViewData["userEm"] = CheckUserById().Result;
             ViewData["name_test"] = name;
             if (analis == null)
             {
@@ -297,15 +301,15 @@ namespace WebApplication1.Controllers
                 return View(analis);
             }
         }
-        
+
         [HttpGet]
         [AllowAnonymous]
         public async Task<IActionResult> GetPassage(string id)
         {
-                var res = await _resultatservices.GetAsync(id);
-                var test = await _testsService.GetAsync(res.Id_test);
-                ViewData["id_r"] = id;
-                return View(test);
+            var res = await _resultatservices.GetAsync(id);
+            var test = await _testsService.GetAsync(res.Id_test);
+            ViewData["id_r"] = id;
+            return View(test);
         }
         [HttpPost]
         [AllowAnonymous]
@@ -332,7 +336,7 @@ namespace WebApplication1.Controllers
         [HttpGet]
         public async Task<JsonResult> GetUrl(string id)
         {
-            var newRes = new Result { Value = "false", Id_test = id};
+            var newRes = new Result { Value = "false", Id_test = id };
             await _resultatservices.CreateAsync(newRes);
             var a = await _resultatservices.GetAsync(newRes.Id);
             return Json(a);
@@ -359,24 +363,24 @@ namespace WebApplication1.Controllers
             }
             List<Dictionary<string, string>> questions = new List<Dictionary<string, string>>();
             List<Questions> questions2 = new List<Questions>();
-            Dictionary<string, string> quest = new Dictionary<string,string>();
+            Dictionary<string, string> quest = new Dictionary<string, string>();
             string col = "col";
             string cat = "cat";
-            for (int i = 0; i < Convert.ToInt16(Request.Form["h_col"][0]);i++)
+            for (int i = 0; i < Convert.ToInt16(Request.Form["h_col"][0]); i++)
             {
                 quest.Clear();
                 Questions quest2 = new Questions();
                 quest2.Quantity = Request.Form[col + i][0];
-                quest2.Category =Request.Form[cat + i][0];
+                quest2.Category = Request.Form[cat + i][0];
                 quest["Quantity"] = Request.Form[col + i][0];
                 quest["Category"] = Request.Form[cat + i][0];
                 Dictionary<string, string> temp = new Dictionary<string, string>(quest);
                 questions.Add(temp);
                 questions2.Add(quest2);
             }
-            for (int i = 0; i < questions.Count-1; i++)
+            for (int i = 0; i < questions.Count - 1; i++)
             {
-                if (questions[i]["Category"] == questions[i+1]["Category"])
+                if (questions[i]["Category"] == questions[i + 1]["Category"])
                 {
                     questions[i]["Quantity"] = (Convert.ToInt16(questions[i]["Quantity"]) +
                                                                 Convert.ToInt16(questions[i + 1]["Quantity"])).ToString();
@@ -385,7 +389,7 @@ namespace WebApplication1.Controllers
                 }
             }
 
-            for (int i = 0; i < questions2.Count-1; i++)
+            for (int i = 0; i < questions2.Count - 1; i++)
             {
                 if (questions2[i].Category == questions2[i + 1].Category)
                 {
@@ -395,18 +399,13 @@ namespace WebApplication1.Controllers
                     i = -1;
                 }
             }
-            var newUser = new Test { Name = Request.Form["name"][0], Questions = questions2, Time = Request.Form["time"][0]};
+            var newUser = new Test { Name = Request.Form["name"][0], Questions = questions2, Time = Request.Form["time"][0] };
             await _testsService.CreateAsync(newUser);
-            
+
             return Redirect(@Url.Action("OpenTestById", "Test"));
         }
 
-        public async Task<IActionResult> OpenTestById()
-        {
-                List<Test> a = await _testsService.GetAsync();
-                var b = a;
-                return View(b);
-        }
+      
 
         [Microsoft.AspNetCore.Mvc.HttpGet]
         public async Task<JsonResult> JsonSearch()
@@ -426,9 +425,9 @@ namespace WebApplication1.Controllers
             var test = await _testsService.GetAsync(id);
             foreach (var cat in test.Questions)
             {
-                    ActionResult<string> log = await GetCategory(cat.Category);
-                    string name = log.Value;
-                    ViewData[(cat.Category)] = name;
+                ActionResult<string> log = await GetCategory(cat.Category);
+                string name = log.Value;
+                ViewData[(cat.Category)] = name;
             }
             return View(test);
         }
@@ -474,5 +473,79 @@ namespace WebApplication1.Controllers
         {
             return View();
         }
+
+        [HttpGet]
+        public async Task<IActionResult> OpenTestById()
+        {
+            var vm = new ListCollection();
+            vm.Tests = await _testsService.GetAsync();
+            vm.Users = await _usersService.GetAsync();
+            return View(vm);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SendMe()
+        {
+            var tests = await _testsService.GetAsync();
+            string f = Request.Form["Field"];
+            foreach (var i in tests.ToList().Where(x=>x.Name.Equals(f)))
+            {
+                if (i.Name == f)
+                {
+                   _emailServices.Send(CheckTestName(f).Result, CheckUserById().Result);
+                }
+                else
+                {
+                    return NotFound();
+                }
+            }
+            return Redirect("/test/OpenTestById");
+        }
+        //ostanovka
+        public async Task<string> CheckTestName(string f)
+        {
+            
+            var tests = await _testsService.GetAsync();
+            string nm = "";
+            foreach (var el in tests)
+            {
+                if (el.Name == f)
+                {
+                    nm = el.Name;
+                }
+            }
+            return nm;
+        }
+
+        public async Task<string> CheckUserById()
+        {
+            var user_name = User.Identity.Name;
+            var users = await _usersService.GetAsync();
+            string nm = "";
+            foreach (var el in users)
+            {
+                if (el.Name == user_name)
+                {
+                    nm = el.Email;
+                }
+            }
+            return nm;
+        }
+
+
+        //public async Task<string> CheckUserId(string id)
+        //{
+        //    var user_name = User.Identity.Name;
+        //    var users = await _usersService.GetAsync();
+        //    foreach (var el in users)
+        //    {
+        //        if (el.Id != null)
+        //        {
+        //            id = el.Id;
+        //        }
+        //    }
+        //    return id;
+        //}
+
     }
 }
