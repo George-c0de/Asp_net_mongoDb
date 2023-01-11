@@ -1,25 +1,38 @@
-name: Asp_net_mongoDb 
-  
-on: workflow_dispatch
+name: 'Build application'
+
+on: [ push ]
 
 jobs:
-  
   build:
+    name: 'Building'
 
-    runs-on: ubuntu-latest
     strategy:
       matrix:
-        dotnet-version: ['6.0.x' ]
+        system:
+          - windows-latest
+          - ubuntu-latest
+        config:
+          - Debug
+          - Release
+
+    runs-on: ${{ matrix.system }}
 
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-dotnet@v2
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
         with:
           dotnet-version: '6.0.x'
-          include-prerelease: true
-      - name: Install dependencies
+
+      - name: Restore dependencies
         run: dotnet restore
-      - name: Build
-        run: dotnet build --configuration Release --no-restore
-      - name: Run Test
-        run: dotnet test --no-restore --verbosity normal
+
+      - name: Build application
+        run: dotnet build WebApplication1.sln -p:Configuration=${{ matrix.config }} --no-restore
+
+      - name: Run tests
+        run: dotnet test WebApplication1.sln --no-restore --verbosity normal
