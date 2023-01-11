@@ -35,4 +35,4 @@ jobs:
         run: dotnet build WebApplication1.sln -p:Configuration=${{ matrix.config }} --no-restore
 
       - name: Run tests
-        run: dotnet test WebApplication1.sln --no-restore --verbosity normal
+        run: dotnet test WebApplication1.sln --no-restore
