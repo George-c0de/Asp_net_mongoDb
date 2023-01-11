@@ -3,7 +3,6 @@ using WebApplication1.Models;
 using WebApplication1.Services;
 using WebApplication1.ViewModels;
 using Microsoft.AspNetCore.Authorization;
-using System.Security.Principal;
 
 namespace WebApplication1.Controllers
 {
@@ -26,9 +25,7 @@ namespace WebApplication1.Controllers
         }
         public async Task<bool> CheckUser()
         {
-            if (User is null)
-                return false;
-            var user_name = User.Identity?.Name;
+            var user_name = User.Identity.Name;
             var users = await _usersService.GetAsync();
             foreach (var el in users)
             {
