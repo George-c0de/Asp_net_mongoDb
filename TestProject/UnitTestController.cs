@@ -33,7 +33,7 @@ namespace TestProject
                 .AddJsonFile("appsettings.json", false)
                 .Build();
 
-            _config = Options.Create(configuration.GetSection("Project20Database").Get<DatabaseSettings>());
+            _config = Options.Create(configuration.GetSection("ProjectDb").Get<DatabaseSettings>());
             return _config;
         }
 
