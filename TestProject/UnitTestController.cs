@@ -109,8 +109,8 @@ namespace TestProject
 			Questions.Add(Question);
 			Test result = new Test()
 			{
-				Name = "MyTest",
-				Time = "300",
+				Name = "1",
+				Time = "50",
 				Questions = Questions,
 			};
 			//
@@ -127,9 +127,9 @@ namespace TestProject
 			QuestionsServices questionServices = new QuestionsServices(Connect());
 			Question question = new Question()
 			{
-				Text = "MyTest",
-				Answer = "MyAnswer",
-				id_category = "14characters144",
+				Text = "1",
+				Answer = "1",
+				id_category = "63c03507639d4ba9f809e910",
 				Note = "not",
 			};
 			await questionServices.CreateAsync(question);
