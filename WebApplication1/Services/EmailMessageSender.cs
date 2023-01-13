@@ -73,5 +73,26 @@ namespace WebApplication1.Services
             smtp.Send(m);
         }
 
+
+		public async Task SendEmailAsync(string subject, string message)
+		{
+			MailAddress from = new MailAddress("allaxverdiyevparviz@gmail.com", "OnlineTest");
+			//komy
+			MailAddress to = new MailAddress(subject, message);
+			MailMessage m = new MailMessage(from, to);
+			// тема письма
+			m.Subject = "Подтверждение почты OnlineTest";
+			// текст письма
+			m.Body = message;
+
+			SmtpClient smtp = new SmtpClient("smtp.gmail.com", 587);
+			smtp.Credentials = new NetworkCredential("allaxverdiyevparviz@gmail.com", "mtwescwjmvemdhid");
+			smtp.EnableSsl = true;
+			await smtp.SendMailAsync(m);
+			// логин и пароль
+			smtp.EnableSsl = true;
+			smtp.Send(m);
+		}
+
 	}
 }
