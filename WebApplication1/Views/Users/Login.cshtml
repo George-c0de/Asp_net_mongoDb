@@ -1,60 +1,55 @@
 ﻿@model WebApplication1.ViewModels.LoginModel
- 
+<head>
+	<title>Вход</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
 
- 
-<style>
-	h2 {
-		display: flex;
-		align-items: center;
-		align-content: center; 
-		justify-content: center; 
-	}
-	a[id="ro"] {
-		margin-bottom: 100px;
-		margin-left: 10px;
-		width: 150px;
-	}
-	label {
-		margin: 10px;
-		width: 150px;
-	}
-	input {
-		margin: auto;
-		margin-left: 2px;
-		width: 180px;
-	}
-	input[id="bt_login"] {
-		margin: 5px;
-		margin-left: 120px;
-		width: 100px;
-	}
-	form[id="form_log"] {
-		display: flex;
-		align-items: center;
-		align-content: center; 
-		justify-content: center; 
-		overflow: auto;   
-	}
-</style>
-<h2>Авторизация</h2>
-<form id="form_log" asp-action="Login" asp-controller="Users" asp-anti-forgery="true">
-	
-	<div class="validation" asp-validation-summary="ModelOnly"></div>
-	<div>
-		<div class="form-group">
-			<label asp-for="Name">Введите Имя</label>
-			<input asp-for="Name"/>
-			<span asp-validation-for="Name"/>
+	<link rel="stylesheet" type="text/css" href="/css/loginfont/css/util.css">
+	<link rel="stylesheet" type="text/css" href="~/css/loginfont/css/main.css">
+
+</head>
+
+<body>
+
+	<div class="limiter">
+		<div class="container-login100">
+			<div class="wrap-login100">
+				<div class="login100-form-title" style="background-image: url(/css/loginfont/images/bg-01.jpg);">
+					<span class="login100-form-title-1">
+						Войти
+					</span>
+				</div>
+
+				<form class="login100-form validate-form" id="form_log" asp-action="Login" asp-controller="Users" asp-anti-forgery="true">
+					<div class="wrap-input100 validate-input m-b-26">
+						<span class="label-input100">Логин</span>
+						<input class="input100" type="text" asp-for="Name" placeholder="Введите логин">
+						<span class="focus-input100"></span>
+					</div>
+
+					<div class="wrap-input100 validate-input m-b-18">
+						<span class="label-input100">Пароль</span>
+						<input class="input100" type="password" asp-for="Password" placeholder="Введите пароль">
+						<span class="focus-input100"></span>
+					</div>
+
+					<div class="flex-sb-m w-full p-b-30">
+						<div>
+							<a href="/api/ForgotPassword" class="txt1">
+								Забыли пароль?
+							</a>
+							<a href="/api/Register" class="txt1 position-relative">
+								Регистрация
+							</a>
+						</div>
+					</div>
+
+					<div class="container-login100-form-btn">
+						<input class="login100-form-btn" type="submit" value="Войти" />
+					</div>
+				</form>
+			</div>
 		</div>
-		<div class="form-group">
-			<label asp-for="Password">Введите пароль</label>
-			<input  asp-for="Password"/>
-			<span asp-validation-for="Password"/>
-		</div>
-		<a href="/api/ForgotPassword" id="ro">Забыли пароль ?</a>
-		<div class="form-group">
-			<input id="bt_login" type="submit" value="Войти" class="btn btn-outline-dark"/>
-		</div>
-		
 	</div>
-</form>
+
+	
+</body>

@@ -13,7 +13,7 @@
 		margin: 5px;
 	}
 </style>
-<main>
+<main class="text-center">
 	<h1 class="text-center">@Model.Name</h1><br/>
 
 	@foreach (var el in Model.Questions)
@@ -24,9 +24,9 @@
 	}
 	<h5>Время на тест: @Model.Time</h5>
 
-	<button class="btn btn-dark" type="button" id="b1">Создать ссылку</button>
 	<label>Код:</label>
 	<input id="cop" readonly="true"/>
+	<button class="btn btn-dark" type="button" id="b1">Создать ссылку</button> 
 	<div id="mess"></div>
 </main>
 

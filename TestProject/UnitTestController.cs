@@ -33,7 +33,7 @@ namespace TestProject
                 .AddJsonFile("appsettings.json", false)
                 .Build();
 
-            _config = Options.Create(configuration.GetSection("Project20Database").Get<DatabaseSettings>());
+            _config = Options.Create(configuration.GetSection("ProjectDb").Get<DatabaseSettings>());
             return _config;
         }
 
@@ -45,9 +45,11 @@ namespace TestProject
             CategoryServices categoryServices = new CategoryServices(Connect());
             ResultServices resultServices = new ResultServices(Connect());
             QuestionsServices questionServices = new QuestionsServices(Connect());
+            UsersService userService = new UsersService(Connect());
+            EmailMessageSender emailServices = new EmailMessageSender();
             // Act
             TestController controller = new TestController(testsService, categoryServices,
-                resultServices, questionServices);
+                resultServices, questionServices, emailServices, userService);
             var a = await resultServices.GetAsync();
             var b = a.Last();
             var result = await controller.ShowResult(b.Id) as ViewResult;
@@ -63,9 +65,11 @@ namespace TestProject
             CategoryServices categoryServices = new CategoryServices(Connect());
             ResultServices resultServices = new ResultServices(Connect());
             QuestionsServices questionServices = new QuestionsServices(Connect());
+            UsersService userService = new UsersService(Connect());
+            EmailMessageSender emailServices = new EmailMessageSender();
             // Act
             TestController controller = new TestController(testsService, categoryServices,
-                resultServices, questionServices);
+                resultServices, questionServices, emailServices, userService);
             List<TestController.SaveResultClass> result1 = new List<TestController.SaveResultClass>();
             Dictionary<string, string> res_temp = new Dictionary<string, string>();
             res_temp.Add("id", "12345678910111");
@@ -73,22 +77,23 @@ namespace TestProject
             res_temp.Add("id_category", "12345678910111");
             var result = await controller.GetAnalysis(result1);
             // Assert
-            Assert.IsType<Dictionary<string, double>>(result);
+            Assert.IsType<List<TestController.TestResult>>(result);
         }
 
         [Fact]
         public async void CreateCategory()
         {
-            // Arrange
-            CategoryServices categoryServices = new CategoryServices(Connect());
-            QuestionsServices questionServices = new QuestionsServices(Connect());
-            CategoryController controller = new CategoryController(categoryServices, questionServices);
-            CategoryModel model = new CategoryModel();
-            model.Name = "1";
-            // Act
-            var result = await controller.Create(model) as RedirectResult;
-            // Assert
-            Assert.Equal("/category/Index", result?.Url);
+           // Arrange
+           CategoryServices categoryServices = new CategoryServices(Connect());
+           QuestionsServices questionServices = new QuestionsServices(Connect());
+           UsersService userService = new UsersService(Connect());
+           CategoryController controller = new CategoryController(categoryServices, questionServices, userService);
+           CategoryModel model = new CategoryModel();
+           model.Name = "1";
+           // Act
+           var result = await controller.Create(model) as RedirectResult;
+           // Assert
+           Assert.Equal("/category/Index", result?.Url);
         }
 
         [Fact]
