@@ -24,7 +24,7 @@ namespace TestProject
 {
     public class UnitTestController 
     {
-        private IOptions<DatabaseSettings> _config;
+        private IOptions<DatabaseSettings>? _config = null;
 
         public IOptions<DatabaseSettings> Connect()
         {
