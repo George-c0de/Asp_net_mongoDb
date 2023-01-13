@@ -130,6 +130,7 @@ namespace TestProject
 				Text = "1",
 				Answer = "1",
 				id_category = "63c03507639d4ba9f809e910",
+				Complexity = "низкий",
 				Note = "not",
 			};
 			await questionServices.CreateAsync(question);
