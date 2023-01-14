@@ -27,7 +27,7 @@ namespace TestProject
         private IOptions<DatabaseSettings>? _config = null;
 
         public IOptions<DatabaseSettings> Connect()
-        {
+        {   
             var configuration = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("appsettings.json", false)

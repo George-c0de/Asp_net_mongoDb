@@ -58,9 +58,9 @@ namespace WebApplication1.Controllers
 
         public class SaveResultClass
         {
-            public string id { get; set; }
-            public string id_category { get; set; }
-            public string answer { get; set; }
+            public string? id { get; set; }
+            public string? id_category { get; set; }
+            public string? answer { get; set; }
         }
         private readonly TestServices _testsService;
         private readonly CategoryServices _categoryServices;
@@ -416,7 +416,7 @@ namespace WebApplication1.Controllers
         }
 
         [Microsoft.AspNetCore.Mvc.HttpGet("{id:length(24)}")]
-        public async Task<ActionResult<string>> CreateCodeForTest(string id)
+        public async Task<ActionResult<string?>> CreateCodeForTest(string id)
         {
             if (await CheckUser())
             {
