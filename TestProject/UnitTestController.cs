@@ -53,9 +53,11 @@ namespace TestProject
             var a = await resultServices.GetAsync();
             var b = a.Last();
             var result = await controller.ShowResult(b.Id) as ViewResult;
-            // Assert
-            Assert.IsType<Result>(result.Model);
-        }
+			// Assert
+#pragma warning disable CS8602 // –азыменование веро€тной пустой ссылки.
+			Assert.IsType<Result>(result.Model);
+#pragma warning restore CS8602 // –азыменование веро€тной пустой ссылки.
+		}
 
         [Fact]
         public async void GetAnalysis()
@@ -115,9 +117,11 @@ namespace TestProject
             };
             // Act
             await testsService.CreateAsync(result);
-            var result2 = await testsService.GetAsync(result.Id);
-            // Assert
-            Assert.NotNull(result2);
+#pragma warning disable CS8604 // ¬озможно, аргумент-ссылка, допускающий значение NULL.
+			var result2 = await testsService.GetAsync(result.Id);
+#pragma warning restore CS8604 // ¬озможно, аргумент-ссылка, допускающий значение NULL.
+							  // Assert
+			Assert.NotNull(result2);
         }
         [Fact]
         public async void CreateQuestion()
