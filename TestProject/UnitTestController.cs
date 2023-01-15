@@ -106,13 +106,14 @@ namespace TestProject
             List<TestController.Questions> Questions = new List<TestController.Questions>();
 
             TestController.Questions Question = new TestController.Questions();
-            Question.Category = "MyTest";
-            Question.Quantity = "MyAnswer"; 
+            Question.Category = "1";
+            Question.Quantity = "1"; 
             Questions.Add(Question);
             Test result = new Test()
             {
-                Name = "MyTest",
-                Time = "300",
+                Id= "63c18d19dc1ddeab9fd540bd",
+                Name = "1",
+                Time = "1",
                 Questions = Questions,
             };
             // Act
@@ -130,10 +131,12 @@ namespace TestProject
             QuestionsServices questionServices = new QuestionsServices(Connect());
             Question question = new Question()
             {
-                Text = "MyTest",
-                Answer = "MyAnswer",
-                id_category = "14characters144",
-                Note = "not",
+                Id = "63c4239b4c4b9e1ee749b487",
+                Text = "1",
+                Answer = "1",
+                id_category = "1",
+                Complexity = "1",
+                Note = "1",
             };
             await questionServices.CreateAsync(question);
             // Act
