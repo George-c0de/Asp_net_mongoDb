@@ -36,7 +36,7 @@ namespace TestProject
             _config = Options.Create(configuration.GetSection("ProjectDb").Get<DatabaseSettings>());
             return _config;
         }
-
+        //
         [Fact]
         public async void TestViewResultNotNull()
         {
