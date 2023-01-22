@@ -1,4 +1,4 @@
-name: Asp_net_mongoDb_actionstest
+name: Asp_net_mongoDb_Tests
   
 on: [push]
 
