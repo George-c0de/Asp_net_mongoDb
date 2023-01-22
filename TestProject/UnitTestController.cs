@@ -111,7 +111,7 @@ namespace TestProject
             Questions.Add(Question);
             Test result = new Test()
             {
-                Id= "63c18d19dc1ddeab9fd540bd",
+                Id= "6456476",
                 Name = "1",
                 Time = "1",
                 Questions = Questions,
@@ -131,12 +131,12 @@ namespace TestProject
             QuestionsServices questionServices = new QuestionsServices(Connect());
             Question question = new Question()
             {
-                Id = "63c4239b4c4b9e1ee749b487",
-                Text = "1",
-                Answer = "1",
-                id_category = "1",
-                Complexity = "1",
-                Note = "1",
+                Id = "6457467676",
+                Text = "2",
+                Answer = "2",
+                id_category = "2",
+                Complexity = "2",
+                Note = "2",
             };
             await questionServices.CreateAsync(question);
             // Act
