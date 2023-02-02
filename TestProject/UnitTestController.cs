@@ -131,12 +131,12 @@ namespace TestProject
             QuestionsServices questionServices = new QuestionsServices(Connect());
             Question question = new Question()
             {
-                Id = "63c18cf3dc1ddeab9fd540bc",
-                Text = "Что такое переменная ( 1 - тип, 2- область памяти, 3- ячейка",
+                Id = "6457467676",
+                Text = "2",
                 Answer = "2",
-                id_category = "63c03507639d4ba9f809e910",
-                Complexity = "низкий",
-                Note = "Область памяти",
+                id_category = "2",
+                Complexity = "2",
+                Note = "2",
             };
             await questionServices.CreateAsync(question);
             // Act
