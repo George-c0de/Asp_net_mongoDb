@@ -24,19 +24,19 @@ namespace TestProject
 {
     public class UnitTestController 
     {
-        private IOptions<DatabaseSettings> _config;
+        private IOptions<DatabaseSettings>? _config = null;
 
         public IOptions<DatabaseSettings> Connect()
-        {
+        {   
             var configuration = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("appsettings.json", false)
                 .Build();
 
-            _config = Options.Create(configuration.GetSection("Project20Database").Get<DatabaseSettings>());
+            _config = Options.Create(configuration.GetSection("ProjectDb").Get<DatabaseSettings>());
             return _config;
         }
-
+        //
         [Fact]
         public async void TestViewResultNotNull()
         {
@@ -53,9 +53,11 @@ namespace TestProject
             var a = await resultServices.GetAsync();
             var b = a.Last();
             var result = await controller.ShowResult(b.Id) as ViewResult;
-            // Assert
-            Assert.IsType<Result>(result.Model);
-        }
+			// Assert
+#pragma warning disable CS8602 // –азыменование веро€тной пустой ссылки.
+			Assert.IsType<Result>(result.Model);
+#pragma warning restore CS8602 // –азыменование веро€тной пустой ссылки.
+		}
 
         [Fact]
         public async void GetAnalysis()
@@ -104,20 +106,23 @@ namespace TestProject
             List<TestController.Questions> Questions = new List<TestController.Questions>();
 
             TestController.Questions Question = new TestController.Questions();
-            Question.Category = "MyTest";
-            Question.Quantity = "MyAnswer"; 
+            Question.Category = "1";
+            Question.Quantity = "1"; 
             Questions.Add(Question);
             Test result = new Test()
             {
-                Name = "MyTest",
-                Time = "300",
+                Id= "6456476",
+                Name = "1",
+                Time = "1",
                 Questions = Questions,
             };
             // Act
             await testsService.CreateAsync(result);
-            var result2 = await testsService.GetAsync(result.Id);
-            // Assert
-            Assert.NotNull(result2);
+#pragma warning disable CS8604 // ¬озможно, аргумент-ссылка, допускающий значение NULL.
+			var result2 = await testsService.GetAsync(result.Id);
+#pragma warning restore CS8604 // ¬озможно, аргумент-ссылка, допускающий значение NULL.
+							  // Assert
+			Assert.NotNull(result2);
         }
         [Fact]
         public async void CreateQuestion()
@@ -126,10 +131,12 @@ namespace TestProject
             QuestionsServices questionServices = new QuestionsServices(Connect());
             Question question = new Question()
             {
-                Text = "MyTest",
-                Answer = "MyAnswer",
-                id_category = "14characters144",
-                Note = "not",
+                Id = "6457467676",
+                Text = "2",
+                Answer = "2",
+                id_category = "2",
+                Complexity = "2",
+                Note = "2",
             };
             await questionServices.CreateAsync(question);
             // Act
