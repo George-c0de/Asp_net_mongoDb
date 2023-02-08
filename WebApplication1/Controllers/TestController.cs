@@ -58,9 +58,9 @@ namespace WebApplication1.Controllers
 
         public class SaveResultClass
         {
-            public string? id { get; set; }
-            public string? id_category { get; set; }
-            public string? answer { get; set; }
+            public string Id { get; set; }
+            public string id_category { get; set; }
+            public string answer { get; set; }
         }
         private readonly TestServices _testsService;
         private readonly CategoryServices _categoryServices;
@@ -128,7 +128,7 @@ namespace WebApplication1.Controllers
                 var name_ = await _categoryServices.GetAsync(el.id_category);
                 var name = name_.Name;
                 a.SetName(name_.Name);
-                var q = await _questionServices.GetAsync(el.id);
+                var q = await _questionServices.GetAsync(el.Id);
                 if (el.answer == q.Answer)
                 {
 
@@ -176,7 +176,6 @@ namespace WebApplication1.Controllers
         public async Task<int> GetCorrectAnswers(List<Dictionary<string, string>> result)
         {
             int col = result.Count();
-            int percent = 0;
             int right = 0;
             foreach (var el in result)
             {
@@ -203,7 +202,7 @@ namespace WebApplication1.Controllers
             double right = 0;
             foreach (var el in result)
             {
-                var v = await _questionServices.GetAsync(el.id);
+                var v = await _questionServices.GetAsync(el.Id);
                 if (v.Answer == el.answer)
                 {
                     right++;
@@ -238,7 +237,7 @@ namespace WebApplication1.Controllers
                 string id_a = Request.Form[name_id].ToString();
                 string answer = Request.Form[name_an].ToString();
                 SaveResultClass res_temp2 = new SaveResultClass();
-                res_temp2.id = id_a;
+                res_temp2.Id = id_a;
                 res_temp2.answer = answer;
                 var val = await GetCategoryByQuestion(id_a);
                 res_temp2.id_category = val;
@@ -416,7 +415,7 @@ namespace WebApplication1.Controllers
         }
 
         [Microsoft.AspNetCore.Mvc.HttpGet("{id:length(24)}")]
-        public async Task<ActionResult<string?>> CreateCodeForTest(string id)
+        public async Task<ActionResult<string>> CreateCodeForTest(string id)
         {
             if (await CheckUser())
             {

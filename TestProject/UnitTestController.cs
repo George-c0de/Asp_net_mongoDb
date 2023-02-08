@@ -106,14 +106,13 @@ namespace TestProject
             List<TestController.Questions> Questions = new List<TestController.Questions>();
 
             TestController.Questions Question = new TestController.Questions();
-            Question.Category = "1";
-            Question.Quantity = "1"; 
+            Question.Category = "MyTest";
+            Question.Quantity = "MyAnser"; 
             Questions.Add(Question);
             Test result = new Test()
             {
-                Id= "63e406f0ed107ec6cf3e58ef",
-                Name = "Ввод ответов цифрами",
-                Time = "60",
+                Name = "MyTest",
+                Time = "300",
                 Questions = Questions,
             };
             // Act
@@ -131,12 +130,10 @@ namespace TestProject
             QuestionsServices questionServices = new QuestionsServices(Connect());
             Question question = new Question()
             {
-                Id = "63e40696ed107ec6cf3e58ed",
-                Text = "Что такое переменная ( 1 - тип, 2- область памяти, 3- ячейка",
-                Answer = "2",
+                Text = "MyTest",
+                Answer = "MyAnswer",
                 id_category = "63e406154f19383915b3422a",
-                Complexity = "низкий",
-                Note = "Область памяти",
+                Note = "1",
             };
             await questionServices.CreateAsync(question);
             // Act
