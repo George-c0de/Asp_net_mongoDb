@@ -33,7 +33,7 @@ namespace TestProject
                 .AddJsonFile("appsettings.json", false)
                 .Build();
 
-            _config = Options.Create(configuration.GetSection("ProjectDb").Get<DatabaseSettings>());
+            _config = Options.Create(configuration.GetSection("Project20Database").Get<DatabaseSettings>());
             return _config;
         }
         //
@@ -111,9 +111,9 @@ namespace TestProject
             Questions.Add(Question);
             Test result = new Test()
             {
-                Id= "6456476",
-                Name = "1",
-                Time = "1",
+                Id= "63e406f0ed107ec6cf3e58ef",
+                Name = "Ввод ответов цифрами",
+                Time = "60",
                 Questions = Questions,
             };
             // Act
@@ -131,12 +131,12 @@ namespace TestProject
             QuestionsServices questionServices = new QuestionsServices(Connect());
             Question question = new Question()
             {
-                Id = "6457467676",
-                Text = "2",
+                Id = "63e40696ed107ec6cf3e58ed",
+                Text = "Что такое переменная ( 1 - тип, 2- область памяти, 3- ячейка",
                 Answer = "2",
-                id_category = "2",
-                Complexity = "2",
-                Note = "2",
+                id_category = "63e406154f19383915b3422a",
+                Complexity = "низкий",
+                Note = "Область памяти",
             };
             await questionServices.CreateAsync(question);
             // Act
