@@ -130,10 +130,12 @@ namespace TestProject
             QuestionsServices questionServices = new QuestionsServices(Connect());
             Question question = new Question()
             {
+                Id= "63e40696ed107ec6cf3e58ed",
                 Text = "MyTest",
                 Answer = "MyAnswer",
+                Complexity = "1",
                 id_category = "63e406154f19383915b3422a",
-                Note = "1",
+                Note = "not",
             };
             await questionServices.CreateAsync(question);
             // Act
