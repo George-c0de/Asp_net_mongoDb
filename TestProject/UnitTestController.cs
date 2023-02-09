@@ -97,7 +97,7 @@ namespace TestProject
            CategoryController controller = new(categoryServices, questionServices, userService);
 			CategoryModel model = new()
 			{
-				Name = "1"
+				Name = "Программирование"
 			};
 			// Act
 			var result = await controller.Create(model) as RedirectResult;
@@ -114,14 +114,13 @@ namespace TestProject
 
 			TestController.Questions Question = new()
 			{
-				Category = "MyTest",
-				Quantity = "MyAnser"
+				Category = "Программирование",
 			};
 			Questions.Add(Question);
 			Test test = new()
 			{
-				Name = "MyTest",
-				Time = "300",
+				Name = "Ввод цифрами",
+				Time = "200",
 				Questions = Questions,
 			};
 			Test result = test;
@@ -139,10 +138,10 @@ namespace TestProject
             QuestionsServices questionServices = new(Connect());
             Question question = new()
             {
-                Id= "63e40696ed107ec6cf3e58ed",
-                Text = "MyTest",
-                Answer = "MyAnswer",
-                Complexity = "1",
+                
+                Text = "Какие типы данных существует в программировании? Введите ответы цифрам…",
+                Answer = "1,4,5",
+                Complexity = "",
                 id_category = "63e406154f19383915b3422a",
                 Note = "not",
             };
