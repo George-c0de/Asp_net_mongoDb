@@ -289,8 +289,8 @@ namespace WebApplication1.Controllers
             var analis = await _resultatservices.GetAsync(id);
             var name_ = await _testsService.GetAsync(analis.Id_test);
             var name = name_.Name;
-			ViewData["userEm"] = CheckUserById().Result;
-            ViewData["name_test"] = name;
+			//ViewData["userEm"] = CheckUserById().Result;
+            //ViewData["name_test"] = name;
             if (analis == null)
             {
                 return Redirect("Home");
@@ -482,24 +482,24 @@ namespace WebApplication1.Controllers
             return View(vm);
         }
 
-        [HttpPost]
-        public async Task<IActionResult> SendMe()
-        {
-            var tests = await _testsService.GetAsync();
-            string f = Request.Form["Field"];
-            foreach (var i in tests.ToList().Where(x=>x.Name.Equals(f)))
-            {
-                if (i.Name == f)
-                {
-                   _emailServices.Send(CheckTestName(f).Result, CheckUserById().Result);
-                }
-                else
-                {
-                    return NotFound();
-                }
-            }
-            return Redirect("/test/OpenTestById");
-        }
+        //[HttpPost]
+        //public async Task<IActionResult> SendMe()
+        //{
+        //    var tests = await _testsService.GetAsync();
+        //    string f = Request.Form["Field"];
+        //    foreach (var i in tests.ToList().Where(x=>x.Name.Equals(f)))
+        //    {
+        //        if (i.Name == f)
+        //        {
+        //           _emailServices.Send(CheckTestName(f).Result, CheckUserById().Result);
+        //        }
+        //        else
+        //        {
+        //            return NotFound();
+        //        }
+        //    }
+        //    return Redirect("/test/OpenTestById");
+        //}
         //ostanovka
         public async Task<string> CheckTestName(string f)
         {
@@ -516,20 +516,20 @@ namespace WebApplication1.Controllers
             return nm;
         }
 
-        public async Task<string> CheckUserById()
-        {
-            var user_name = User.Identity.Name;
-            var users = await _usersService.GetAsync();
-            string nm = "";
-            foreach (var el in users)
-            {
-                if (el.Name == user_name)
-                {
-                    nm = el.Email;
-                }
-            }
-            return nm;
-        }
+        //public async Task<string> CheckUserById()
+        //{
+        //    var user_name = User.Identity.Name;
+        //    var users = await _usersService.GetAsync();
+        //    string nm = "";
+        //    foreach (var el in users)
+        //    {
+        //        if (el.Name == user_name)
+        //        {
+        //            nm = el.Email;
+        //        }
+        //    }
+        //    return nm;
+        //}
 
 
         //public async Task<string> CheckUserId(string id)

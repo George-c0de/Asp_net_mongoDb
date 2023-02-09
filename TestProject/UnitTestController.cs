@@ -41,14 +41,14 @@ namespace TestProject
         public async void TestViewResultNotNull()
         {
             // Arrange
-            TestServices testsService = new TestServices(Connect());
-            CategoryServices categoryServices = new CategoryServices(Connect());
-            ResultServices resultServices = new ResultServices(Connect());
-            QuestionsServices questionServices = new QuestionsServices(Connect());
-            UsersService userService = new UsersService(Connect());
-            EmailMessageSender emailServices = new EmailMessageSender();
+            TestServices testsService = new(Connect());
+            CategoryServices categoryServices = new(Connect());
+            ResultServices resultServices = new(Connect());
+            QuestionsServices questionServices = new(Connect());
+            UsersService userService = new(Connect());
+            EmailMessageSender emailServices = new();
             // Act
-            TestController controller = new TestController(testsService, categoryServices,
+            TestController controller = new(testsService, categoryServices,
                 resultServices, questionServices, emailServices, userService);
             var a = await resultServices.GetAsync();
             var b = a.Last();
@@ -63,21 +63,26 @@ namespace TestProject
         public async void GetAnalysis()
         {
             // Arrange
-            TestServices testsService = new TestServices(Connect());
-            CategoryServices categoryServices = new CategoryServices(Connect());
-            ResultServices resultServices = new ResultServices(Connect());
-            QuestionsServices questionServices = new QuestionsServices(Connect());
-            UsersService userService = new UsersService(Connect());
-            EmailMessageSender emailServices = new EmailMessageSender();
+            TestServices testsService = new(Connect());
+            CategoryServices categoryServices = new(Connect());
+            ResultServices resultServices = new(Connect());
+            QuestionsServices questionServices = new(Connect());
+            UsersService userService = new(Connect());
+            EmailMessageSender emailServices = new();
             // Act
-            TestController controller = new TestController(testsService, categoryServices,
+            TestController controller = new(testsService, categoryServices,
                 resultServices, questionServices, emailServices, userService);
-            List<TestController.SaveResultClass> result1 = new List<TestController.SaveResultClass>();
-            Dictionary<string, string> res_temp = new Dictionary<string, string>();
-            res_temp.Add("id", "12345678910111");
-            res_temp.Add("answer", "answer");
-            res_temp.Add("id_category", "12345678910111");
-            var result = await controller.GetAnalysis(result1);
+			List<TestController.SaveResultClass> saveResultClasses = new();
+			List<TestController.SaveResultClass> result1 = saveResultClasses;
+#pragma warning disable IDE0059 // Ќенужное присваивание значени€
+			Dictionary<string, string> res_temp = new()
+			{
+				{ "id", "12345678910111" },
+				{ "answer", "answer" },
+				{ "id_category", "12345678910111" }
+			};
+#pragma warning restore IDE0059 // Ќенужное присваивание значени€
+			var result = await controller.GetAnalysis(result1);
             // Assert
             Assert.IsType<List<TestController.TestResult>>(result);
         }
@@ -86,14 +91,16 @@ namespace TestProject
         public async void CreateCategory()
         {
            // Arrange
-           CategoryServices categoryServices = new CategoryServices(Connect());
-           QuestionsServices questionServices = new QuestionsServices(Connect());
-           UsersService userService = new UsersService(Connect());
-           CategoryController controller = new CategoryController(categoryServices, questionServices, userService);
-           CategoryModel model = new CategoryModel();
-           model.Name = "1";
-           // Act
-           var result = await controller.Create(model) as RedirectResult;
+           CategoryServices categoryServices = new(Connect());
+           QuestionsServices questionServices = new(Connect());
+           UsersService userService = new(Connect());
+           CategoryController controller = new(categoryServices, questionServices, userService);
+			CategoryModel model = new()
+			{
+				Name = "1"
+			};
+			// Act
+			var result = await controller.Create(model) as RedirectResult;
            // Assert
            Assert.Equal("/category/Index", result?.Url);
         }
@@ -102,24 +109,25 @@ namespace TestProject
         public async void CreateTest()
         {
             //Arrange
-            TestServices testsService = new TestServices(Connect());
-            List<TestController.Questions> Questions = new List<TestController.Questions>();
+            TestServices testsService = new(Connect());
+            List<TestController.Questions> Questions = new();
 
-            TestController.Questions Question = new TestController.Questions();
-            Question.Category = "MyTest";
-            Question.Quantity = "MyAnser"; 
-            Questions.Add(Question);
-            Test result = new Test()
-            {
-                Name = "MyTest",
-                Time = "300",
-                Questions = Questions,
-            };
+			TestController.Questions Question = new()
+			{
+				Category = "MyTest",
+				Quantity = "MyAnser"
+			};
+			Questions.Add(Question);
+			Test test = new()
+			{
+				Name = "MyTest",
+				Time = "300",
+				Questions = Questions,
+			};
+			Test result = test;
             // Act
             await testsService.CreateAsync(result);
-#pragma warning disable CS8604 // ¬озможно, аргумент-ссылка, допускающий значение NULL.
 			var result2 = await testsService.GetAsync(result.Id);
-#pragma warning restore CS8604 // ¬озможно, аргумент-ссылка, допускающий значение NULL.
 							  // Assert
 			Assert.NotNull(result2);
         }
@@ -127,8 +135,8 @@ namespace TestProject
         public async void CreateQuestion()
         {
             //Arrange
-            QuestionsServices questionServices = new QuestionsServices(Connect());
-            Question question = new Question()
+            QuestionsServices questionServices = new(Connect());
+            Question question = new()
             {
                 Id= "63e40696ed107ec6cf3e58ed",
                 Text = "MyTest",
