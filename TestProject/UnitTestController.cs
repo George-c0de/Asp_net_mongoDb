@@ -77,9 +77,9 @@ namespace TestProject
 #pragma warning disable IDE0059 // Ненужное присваивание значения
 			Dictionary<string, string> res_temp = new()
 			{
-				{ "id", "12345678910111" },
+				{ "id", "2234534365" },
 				{ "answer", "answer" },
-				{ "id_category", "12345678910111" }
+				{ "id_category", "2234534365" }
 			};
 #pragma warning restore IDE0059 // Ненужное присваивание значения
 			var result = await controller.GetAnalysis(result1);
