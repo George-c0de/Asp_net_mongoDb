@@ -17,17 +17,18 @@ namespace WebApplication1.Services
             var mongoDatabase = mongoClient.GetDatabase(
                 DatabaseSettings.Value.DatabaseName);
 
-            _testCollection = mongoDatabase.GetCollection<Test>(
-                "Test");
+            _testCollection = mongoDatabase.GetCollection<Test>("Test");
         }
 
         public async Task<List<Test>> GetAsync() =>
             await _testCollection.Find(_ => true).ToListAsync();
 
-        public async Task<Test?> GetAsync(string id) =>
+#pragma warning disable CS8632 // Аннотацию для ссылочных типов, допускающих значения NULL, следует использовать в коде только в контексте аннотаций "#nullable".
+		public async Task<Test?> GetAsync(string id) =>
             await _testCollection.Find(x => x.Id == id).FirstOrDefaultAsync();
+#pragma warning restore CS8632 // Аннотацию для ссылочных типов, допускающих значения NULL, следует использовать в коде только в контексте аннотаций "#nullable".
 
-        public async Task CreateAsync(Test newUser) =>
+		public async Task CreateAsync(Test newUser) =>
             await _testCollection.InsertOneAsync(newUser);
 
         public async Task UpdateAsync(string id, Test updatedTest) =>
