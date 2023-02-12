@@ -24,10 +24,10 @@ namespace TestProject
 {
     public class UnitTestController 
     {
-        private IOptions<DatabaseSettings>? _config = null;
+        private IOptions<DatabaseSettings> _config;
 
         public IOptions<DatabaseSettings> Connect()
-        {   
+        {
             var configuration = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("appsettings.json", false)
@@ -36,53 +36,46 @@ namespace TestProject
             _config = Options.Create(configuration.GetSection("Project20Database").Get<DatabaseSettings>());
             return _config;
         }
-        //
+
         [Fact]
         public async void TestViewResultNotNull()
         {
             // Arrange
-            TestServices testsService = new(Connect());
-            CategoryServices categoryServices = new(Connect());
-            ResultServices resultServices = new(Connect());
-            QuestionsServices questionServices = new(Connect());
-            UsersService userService = new(Connect());
-            EmailMessageSender emailServices = new();
+            TestServices testsService = new TestServices(Connect());
+            CategoryServices categoryServices = new CategoryServices(Connect());
+            ResultServices resultServices = new ResultServices(Connect());
+            QuestionsServices questionServices = new QuestionsServices(Connect());
+            UsersService userService = new UsersService(Connect());
+            EmailMessageSender emailServices = new EmailMessageSender();
             // Act
-            TestController controller = new(testsService, categoryServices,
+            TestController controller = new TestController(testsService, categoryServices,
                 resultServices, questionServices, emailServices, userService);
             var a = await resultServices.GetAsync();
             var b = a.Last();
             var result = await controller.ShowResult(b.Id) as ViewResult;
-			// Assert
-#pragma warning disable CS8602 // Разыменование вероятной пустой ссылки.
-			Assert.IsType<Result>(result.Model);
-#pragma warning restore CS8602 // Разыменование вероятной пустой ссылки.
-		}
+            // Assert
+            Assert.IsType<Result>(result.Model);
+        }
 
         [Fact]
         public async void GetAnalysis()
         {
             // Arrange
-            TestServices testsService = new(Connect());
-            CategoryServices categoryServices = new(Connect());
-            ResultServices resultServices = new(Connect());
-            QuestionsServices questionServices = new(Connect());
-            UsersService userService = new(Connect());
-            EmailMessageSender emailServices = new();
+            TestServices testsService = new TestServices(Connect());
+            CategoryServices categoryServices = new CategoryServices(Connect());
+            ResultServices resultServices = new ResultServices(Connect());
+            QuestionsServices questionServices = new QuestionsServices(Connect());
+            UsersService userService = new UsersService(Connect());
+            EmailMessageSender emailServices = new EmailMessageSender();
             // Act
-            TestController controller = new(testsService, categoryServices,
+            TestController controller = new TestController(testsService, categoryServices,
                 resultServices, questionServices, emailServices, userService);
-			List<TestController.SaveResultClass> saveResultClasses = new();
-			List<TestController.SaveResultClass> result1 = saveResultClasses;
-#pragma warning disable IDE0059 // Ненужное присваивание значения
-			Dictionary<string, string> res_temp = new()
-			{
-				{ "id", "3426568345gd465" },
-				{ "answer", "answers1253453" },
-				{ "id_category", "342656834565" }
-			};
-#pragma warning restore IDE0059 // Ненужное присваивание значения
-			var result = await controller.GetAnalysis(result1);
+            List<TestController.SaveResultClass> result1 = new List<TestController.SaveResultClass>();
+            Dictionary<string, string> res_temp = new Dictionary<string, string>();
+            res_temp.Add("id", "12345678910111");
+            res_temp.Add("answer", "answer");
+            res_temp.Add("id_category", "12345678910111");
+            var result = await controller.GetAnalysis(result1);
             // Assert
             Assert.IsType<List<TestController.TestResult>>(result);
         }
@@ -91,16 +84,14 @@ namespace TestProject
         public async void CreateCategory()
         {
            // Arrange
-           CategoryServices categoryServices = new(Connect());
-           QuestionsServices questionServices = new(Connect());
-           UsersService userService = new(Connect());
-           CategoryController controller = new(categoryServices, questionServices, userService);
-			CategoryModel model = new()
-			{
-				Name = "Программирование"
-			};
-			// Act
-			var result = await controller.Create(model) as RedirectResult;
+           CategoryServices categoryServices = new CategoryServices(Connect());
+           QuestionsServices questionServices = new QuestionsServices(Connect());
+           UsersService userService = new UsersService(Connect());
+           CategoryController controller = new CategoryController(categoryServices, questionServices, userService);
+           CategoryModel model = new CategoryModel();
+           model.Name = "1";
+           // Act
+           var result = await controller.Create(model) as RedirectResult;
            // Assert
            Assert.Equal("/category/Index", result?.Url);
         }
@@ -109,40 +100,35 @@ namespace TestProject
         public async void CreateTest()
         {
             //Arrange
-            TestServices testsService = new(Connect());
-            List<TestController.Questions> Questions = new();
+            TestServices testsService = new TestServices(Connect());
+            List<TestController.Questions> Questions = new List<TestController.Questions>();
 
-			TestController.Questions Question = new()
-			{
-				Category = "Программирование",
-			};
-			Questions.Add(Question);
-			Test test = new()
-			{
-				Name = "Ввод цифрами",
-				Time = "200",
-				Questions = Questions,
-			};
-			Test result = test;
+            TestController.Questions Question = new TestController.Questions();
+            Question.Category = "MyTest";
+            Question.Quantity = "MyAnswer"; 
+            Questions.Add(Question);
+            Test result = new Test()
+            {
+                Name = "MyTest",
+                Time = "300",
+                Questions = Questions,
+            };
             // Act
             await testsService.CreateAsync(result);
-			var result2 = await testsService.GetAsync(result.Id);
-							  // Assert
-			Assert.NotNull(result2);
+            var result2 = await testsService.GetAsync(result.Id);
+            // Assert
+            Assert.NotNull(result2);
         }
         [Fact]
-        //
         public async void CreateQuestion()
         {
             //Arrange
-            QuestionsServices questionServices = new(Connect());
-            Question question = new()
+            QuestionsServices questionServices = new QuestionsServices(Connect());
+            Question question = new Question()
             {
-                
-                Text = "Какие типы данных существует в программировании? Введите ответы цифрам…",
-                Answer = "1,4,5",
-                Complexity = "",
-                id_category = "63e406154f19383915b3422a",
+                Text = "MyTest",
+                Answer = "MyAnswer",
+                id_category = "14characters144",
                 Note = "not",
             };
             await questionServices.CreateAsync(question);

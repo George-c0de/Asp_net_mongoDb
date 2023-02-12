@@ -24,12 +24,10 @@ namespace WebApplication1.Services
         public async Task<List<Category>> GetAsync() =>
             await _CategoryCollection.Find(_ => true).ToListAsync();
 
-#pragma warning disable CS8632 // Аннотацию для ссылочных типов, допускающих значения NULL, следует использовать в коде только в контексте аннотаций "#nullable".
-		public async Task<Category?> GetAsync(string id) =>
+        public async Task<Category?> GetAsync(string id) =>
             await _CategoryCollection.Find(x => x.Id == id).FirstOrDefaultAsync();
-#pragma warning restore CS8632 // Аннотацию для ссылочных типов, допускающих значения NULL, следует использовать в коде только в контексте аннотаций "#nullable".
 
-		public async Task CreateAsync(Category newUser) =>
+        public async Task CreateAsync(Category newUser) =>
             await _CategoryCollection.InsertOneAsync(newUser);
 
         public async Task UpdateAsync(string id, Category updatedCategory) =>

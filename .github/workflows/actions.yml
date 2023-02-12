@@ -1,6 +1,6 @@
-name: Asp_net_mongoDb_Tests
+name: Asp_net_mongoDb 
   
-on: [push]
+on: workflow_dispatch
 
 jobs:
   

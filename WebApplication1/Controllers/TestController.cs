@@ -58,7 +58,7 @@ namespace WebApplication1.Controllers
 
         public class SaveResultClass
         {
-            public string Id { get; set; }
+            public string id { get; set; }
             public string id_category { get; set; }
             public string answer { get; set; }
         }
@@ -128,7 +128,7 @@ namespace WebApplication1.Controllers
                 var name_ = await _categoryServices.GetAsync(el.id_category);
                 var name = name_.Name;
                 a.SetName(name_.Name);
-                var q = await _questionServices.GetAsync(el.Id);
+                var q = await _questionServices.GetAsync(el.id);
                 if (el.answer == q.Answer)
                 {
 
@@ -176,6 +176,7 @@ namespace WebApplication1.Controllers
         public async Task<int> GetCorrectAnswers(List<Dictionary<string, string>> result)
         {
             int col = result.Count();
+            int percent = 0;
             int right = 0;
             foreach (var el in result)
             {
@@ -202,7 +203,7 @@ namespace WebApplication1.Controllers
             double right = 0;
             foreach (var el in result)
             {
-                var v = await _questionServices.GetAsync(el.Id);
+                var v = await _questionServices.GetAsync(el.id);
                 if (v.Answer == el.answer)
                 {
                     right++;
@@ -237,7 +238,7 @@ namespace WebApplication1.Controllers
                 string id_a = Request.Form[name_id].ToString();
                 string answer = Request.Form[name_an].ToString();
                 SaveResultClass res_temp2 = new SaveResultClass();
-                res_temp2.Id = id_a;
+                res_temp2.id = id_a;
                 res_temp2.answer = answer;
                 var val = await GetCategoryByQuestion(id_a);
                 res_temp2.id_category = val;
@@ -250,9 +251,9 @@ namespace WebApplication1.Controllers
             double temp_per = await GetPercent(result);
             double percent = Math.Round(temp_per, 2);
             string rec;
-            if (keyValuePairs.Count() != 1 && percent ==100)
+            if (keyValuePairs.Count() != 1 && percent != 0)
             {
-                rec = "Мы рекомендуем вам выбрать свою профессию, так как вы сдали на 100%!" ;
+                rec = "Мы рекомендуем вам поступать на " + keyValuePairs.Last().GetName();
 
             }
             else if (percent == 0)
@@ -289,8 +290,8 @@ namespace WebApplication1.Controllers
             var analis = await _resultatservices.GetAsync(id);
             var name_ = await _testsService.GetAsync(analis.Id_test);
             var name = name_.Name;
-			//ViewData["userEm"] = CheckUserById().Result;
-            //ViewData["name_test"] = name;
+			ViewData["userEm"] = CheckUserById().Result;
+            ViewData["name_test"] = name;
             if (analis == null)
             {
                 return Redirect("Home");
@@ -482,24 +483,24 @@ namespace WebApplication1.Controllers
             return View(vm);
         }
 
-        //[HttpPost]
-        //public async Task<IActionResult> SendMe()
-        //{
-        //    var tests = await _testsService.GetAsync();
-        //    string f = Request.Form["Field"];
-        //    foreach (var i in tests.ToList().Where(x=>x.Name.Equals(f)))
-        //    {
-        //        if (i.Name == f)
-        //        {
-        //           _emailServices.Send(CheckTestName(f).Result, CheckUserById().Result);
-        //        }
-        //        else
-        //        {
-        //            return NotFound();
-        //        }
-        //    }
-        //    return Redirect("/test/OpenTestById");
-        //}
+        [HttpPost]
+        public async Task<IActionResult> SendMe()
+        {
+            var tests = await _testsService.GetAsync();
+            string f = Request.Form["Field"];
+            foreach (var i in tests.ToList().Where(x=>x.Name.Equals(f)))
+            {
+                if (i.Name == f)
+                {
+                   _emailServices.Send(CheckTestName(f).Result, CheckUserById().Result);
+                }
+                else
+                {
+                    return NotFound();
+                }
+            }
+            return Redirect("/test/OpenTestById");
+        }
         //ostanovka
         public async Task<string> CheckTestName(string f)
         {
@@ -516,20 +517,20 @@ namespace WebApplication1.Controllers
             return nm;
         }
 
-        //public async Task<string> CheckUserById()
-        //{
-        //    var user_name = User.Identity.Name;
-        //    var users = await _usersService.GetAsync();
-        //    string nm = "";
-        //    foreach (var el in users)
-        //    {
-        //        if (el.Name == user_name)
-        //        {
-        //            nm = el.Email;
-        //        }
-        //    }
-        //    return nm;
-        //}
+        public async Task<string> CheckUserById()
+        {
+            var user_name = User.Identity.Name;
+            var users = await _usersService.GetAsync();
+            string nm = "";
+            foreach (var el in users)
+            {
+                if (el.Name == user_name)
+                {
+                    nm = el.Email;
+                }
+            }
+            return nm;
+        }
 
 
         //public async Task<string> CheckUserId(string id)

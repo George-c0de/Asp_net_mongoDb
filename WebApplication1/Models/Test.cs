@@ -10,17 +10,17 @@ namespace WebApplication1.Models
     {
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
-        public string? Id { get; set; }
+        public string Id { get; set; }
 
         [BsonElement("Name")]
         [Display(Name = "Имя")]
-        public string? Name { get; set; }
+        public string Name { get; set; }
 
         [Display(Name = "Вопросы")]
-        public List<TestController.Questions>? Questions { get; set; }
+        public List<TestController.Questions> Questions { get; set; }
 
         [Display(Name = "Время")]
-        public string? Time { get; set; }
+        public string Time { get; set; }
 
     }
 }
