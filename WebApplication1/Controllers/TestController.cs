@@ -68,10 +68,13 @@ namespace WebApplication1.Controllers
         private readonly QuestionsServices _questionServices;
         private readonly EmailMessageSender _emailServices;
         private readonly UsersService _usersService;
+        //private readonly IRepository repo;
+
         public TestController(
             TestServices testsService, CategoryServices categoryServices,
             ResultServices resultServices, QuestionsServices questionServices,
             EmailMessageSender emailServices, UsersService usersService
+            //IRepository r
             )
         {
             _usersService = usersService;
@@ -80,10 +83,11 @@ namespace WebApplication1.Controllers
             _categoryServices = categoryServices;
             _questionServices = questionServices;
             _emailServices = emailServices;
+            //repo = r;
         }
 
 
-        [HttpGet]
+		[HttpGet]
         public async Task<IActionResult> Create()
         {
             if (await CheckUser())
@@ -480,6 +484,7 @@ namespace WebApplication1.Controllers
             var vm = new ListCollection();
             vm.Tests = await _testsService.GetAsync();
             vm.Users = await _usersService.GetAsync();
+            //return View(repo.GetAll());
             return View(vm);
         }
 
@@ -488,6 +493,7 @@ namespace WebApplication1.Controllers
         {
             var tests = await _testsService.GetAsync();
             string f = Request.Form["Field"];
+            f = f.Trim();
             foreach (var i in tests.ToList().Where(x=>x.Name.Equals(f)))
             {
                 if (i.Name == f)

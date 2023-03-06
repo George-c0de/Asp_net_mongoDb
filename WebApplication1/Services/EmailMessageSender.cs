@@ -51,7 +51,7 @@ namespace WebApplication1.Services
 
         public void Send(string testname, string useremail)
         {
-            MailAddress from = new MailAddress("allaxverdiyevparviz@gmail.com", "ONLINETESTPAD");
+            MailAddress from = new MailAddress("allaxverdiyevparviz@gmail.com", "ONLINETESTS");
             //komy
             MailAddress to = new MailAddress("maks_panf@mail.ru");
             MailMessage m = new MailMessage(from, to);
@@ -73,5 +73,28 @@ namespace WebApplication1.Services
             smtp.Send(m);
         }
 
-    }
+		public async Task SendEmailAsync(string email, string subject, string message)
+		{
+			MailAddress from = new MailAddress("allaxverdiyevparviz@gmail.com", "ONLINETESTS");
+			//komy
+			MailAddress to = new MailAddress(email);
+			MailMessage m = new MailMessage(from, to);
+			// тема письма
+			m.Subject = "Восстоновление пароля";
+			// текст письма
+			string body;
+			body = "<h5>" + "Администрация: " + message + "</h5>";
+
+			m.Body = body;
+			// письмо представляет код html
+			m.IsBodyHtml = true;
+			// адрес smtp-сервера и порт, с которого будем отправлять письмо
+			SmtpClient smtp = new SmtpClient("smtp.gmail.com", 587);
+			// логин и пароль
+			smtp.Credentials = new NetworkCredential("allaxverdiyevparviz@gmail.com", "mtwescwjmvemdhid");
+			smtp.EnableSsl = true;
+			smtp.Send(m);
+		}
+
+	}
 }

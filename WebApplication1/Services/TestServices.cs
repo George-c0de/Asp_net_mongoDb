@@ -27,8 +27,8 @@ namespace WebApplication1.Services
         public async Task<Test?> GetAsync(string id) =>
             await _testCollection.Find(x => x.Id == id).FirstOrDefaultAsync();
 
-        public async Task CreateAsync(Test newUser) =>
-            await _testCollection.InsertOneAsync(newUser);
+        public async Task CreateAsync(Test newtest) =>
+            await _testCollection.InsertOneAsync(newtest);
 
         public async Task UpdateAsync(string id, Test updatedTest) =>
             await _testCollection.ReplaceOneAsync(x => x.Id == id, updatedTest);

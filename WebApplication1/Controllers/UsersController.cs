@@ -68,14 +68,14 @@ public class UsersController : Controller
 
             var code = await _usersService.GetToken(user.Id);
             var callbackUrl = Url.Action("ResetPassword", "Users", new { userId = user.Id, code = code }, protocol: HttpContext.Request.Scheme);
-            /*
-            Здесь отправка по email, так как ветка без предыдущего пула
-             * EmailService emailService = new EmailService();
-            await emailService.SendEmailAsync(model.Email, "Reset Password",
-                $"Для сброса пароля пройдите по ссылке: <a href='{callbackUrl}'>link</a>");
-             пока просто редирект
-             */
-            return Redirect(Url.Action("ResetPassword","Users", new { userId = user.Id, code = code }, protocol: HttpContext.Request.Scheme));
+
+            //Здесь отправка по email, так как ветка без предыдущего пула
+              EmailMessageSender emailService = new EmailMessageSender();
+            await emailService.SendEmailAsync(model.Email, "Reset Password", $"Для сброса пароля пройдите по ссылке: <a href='{callbackUrl}'>link</a>");
+            //пока просто редирект
+
+
+            //return Redirect(Url.Action("ResetPassword","Users", new { userId = user.Id, code = code }, protocol: HttpContext.Request.Scheme));
             return View("ForgotPasswordConfirmation");
         }
         return View(model);
