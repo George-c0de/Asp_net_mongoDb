@@ -12,13 +12,13 @@ namespace WebApplication1.Controllers
     [Route("category/[action]")]
     public class CategoryController : Controller
     {
-        private readonly CategoryServices _categoryServices;
-        private readonly QuestionsServices _questionServices;
-        private readonly UsersService _usersService;
+        private readonly ICategoryServices _categoryServices;
+        private readonly IQuestionsServices _questionServices;
+        private readonly IUsersService _usersService;
 
         public CategoryController(
-            CategoryServices categoryServices, QuestionsServices questionServices, 
-            UsersService usersService)
+            ICategoryServices categoryServices, IQuestionsServices questionServices, 
+            IUsersService usersService)
         {
             _usersService = usersService;
             _categoryServices = categoryServices;

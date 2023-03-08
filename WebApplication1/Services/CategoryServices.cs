@@ -4,7 +4,19 @@ using WebApplication1.Models;
 
 namespace WebApplication1.Services
 {
-    public class CategoryServices
+    public interface ICategoryServices
+    {
+        Task<List<Category>> GetAsync();
+
+        Task<Category?> GetAsync(string id);
+
+        Task CreateAsync(Category newUser);
+
+        Task UpdateAsync(string id, Category updatedCategory);
+
+        Task RemoveAsync(string id);
+    }
+    public class CategoryServices : ICategoryServices
     {
         private readonly IMongoCollection<Category> _CategoryCollection;
 

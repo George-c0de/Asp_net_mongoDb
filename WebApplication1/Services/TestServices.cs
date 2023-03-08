@@ -4,7 +4,19 @@ using WebApplication1.Models;
 
 namespace WebApplication1.Services
 {
-    public class TestServices
+    public interface ITestServices
+    {
+        Task<List<Test>> GetAsync();
+
+        Task<Test?> GetAsync(string id);
+
+        Task CreateAsync(Test newtest);
+
+        Task UpdateAsync(string id, Test updatedTest);
+
+        Task RemoveAsync(string id);
+    }
+    public class TestServices : ITestServices
     {
         private readonly IMongoCollection<Test> _testCollection;
 

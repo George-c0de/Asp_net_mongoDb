@@ -13,13 +13,13 @@ namespace WebApplication1.Controllers
     [Route("question/[action]")]
     public class QuestionsController : Controller
     {
-        private readonly QuestionsServices _questionsService;
-        private readonly CategoryServices _categoryService;
-        private readonly UsersService _usersService;
+        private readonly IQuestionsServices _questionsService;
+        private readonly ICategoryServices _categoryService;
+        private readonly IUsersService _usersService;
 
 
-        public QuestionsController(QuestionsServices questionsService, 
-            CategoryServices categoryService, UsersService usersService)
+        public QuestionsController(IQuestionsServices questionsService, 
+            ICategoryServices categoryService, IUsersService usersService)
         {
             _categoryService = categoryService;
             _questionsService = questionsService;

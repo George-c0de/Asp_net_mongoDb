@@ -21,13 +21,13 @@ ConventionRegistry.Register("My Solution Conventions", pack, t => true);
 builder.Services.Configure<DatabaseSettings>(
 	builder.Configuration.GetSection("Project20Database"));
 
-builder.Services.AddSingleton<UsersService>();
-builder.Services.AddSingleton<TestServices>();
-builder.Services.AddSingleton<CategoryServices>();
-builder.Services.AddSingleton<QuestionsServices>();
-builder.Services.AddSingleton<ResultServices>();
-builder.Services.AddSingleton<EmailMessageSender>();
-//IMongoCollection<Users> Users; // коллекция в базе данных
+builder.Services.AddSingleton<IUsersService,UsersService>();
+builder.Services.AddSingleton<ITestServices,TestServices>();
+builder.Services.AddSingleton<ICategoryServices,CategoryServices>();
+builder.Services.AddSingleton<IQuestionsServices,QuestionsServices>();
+builder.Services.AddSingleton<IResultServices,ResultServices>();
+builder.Services.AddSingleton<IEmailMessageSender,EmailMessageSender>();
+//IMongoCollection<Users> Users; // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 //IGridFSBucket gridFS;
 //////MongoDB
 //var settings = MongoClientSettings.FromConnectionString("mongodb+srv://admin:admin@cluster0.c37dj.mongodb.net/Project20?retryWrites=true&w=majority");

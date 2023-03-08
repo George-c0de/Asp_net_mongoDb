@@ -4,7 +4,13 @@ using WebApplication1.Models;
 
 namespace WebApplication1.Services
 {
-    public class EmailMessageSender
+	public interface IEmailMessageSender
+	{
+		void Send(string email, string id, Result result, string name);
+		void Send(string testname, string useremail);
+		Task SendEmailAsync(string email, string subject, string message);
+	}
+    public class EmailMessageSender : IEmailMessageSender
     {
         //private string email;
         //private string id;

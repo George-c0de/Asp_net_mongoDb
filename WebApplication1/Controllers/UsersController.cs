@@ -13,9 +13,9 @@ namespace WebApplication1.Controllers;
 [Route("api/[action]")]
 public class UsersController : Controller
 {
-    private readonly UsersService _usersService;
+    private readonly IUsersService _usersService;
 
-    public UsersController(UsersService usersService) =>
+    public UsersController(IUsersService usersService) =>
         _usersService = usersService;
 
     [HttpGet]

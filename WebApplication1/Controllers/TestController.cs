@@ -62,20 +62,18 @@ namespace WebApplication1.Controllers
             public string id_category { get; set; }
             public string answer { get; set; }
         }
-        private readonly TestServices _testsService;
-        private readonly CategoryServices _categoryServices;
-        private readonly ResultServices _resultatservices;
-        private readonly QuestionsServices _questionServices;
-        private readonly EmailMessageSender _emailServices;
-        private readonly UsersService _usersService;
+        private readonly ITestServices _testsService;
+        private readonly ICategoryServices _categoryServices;
+        private readonly IResultServices _resultatservices;
+        private readonly IQuestionsServices _questionServices;
+        private readonly IEmailMessageSender _emailServices;
+        private readonly IUsersService _usersService;
         //private readonly IRepository repo;
 
         public TestController(
-            TestServices testsService, CategoryServices categoryServices,
-            ResultServices resultServices, QuestionsServices questionServices,
-            EmailMessageSender emailServices, UsersService usersService
-            //IRepository r
-            )
+            ITestServices testsService, ICategoryServices categoryServices,
+            IResultServices resultServices, IQuestionsServices questionServices,
+            IEmailMessageSender emailServices, IUsersService usersService)
         {
             _usersService = usersService;
             _resultatservices = resultServices;

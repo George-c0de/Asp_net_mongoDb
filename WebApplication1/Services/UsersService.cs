@@ -4,7 +4,20 @@ using WebApplication1.Models;
 
 namespace WebApplication1.Services
 {
-    public class UsersService
+    public interface IUsersService
+    {
+        Task<string> GetToken(string id);
+        Task<List<Users>> GetAsync();
+
+        Task<Users?> GetAsync(string id);
+
+        Task CreateAsync(Users newUser);
+
+        Task UpdateAsync(string id, Users updatedUser);
+
+        Task RemoveAsync(string id);
+    }
+    public class UsersService : IUsersService
     {
         private readonly IMongoCollection<Users> _usersCollection;
 

@@ -4,7 +4,20 @@ using WebApplication1.Models;
 
 namespace WebApplication1.Services
 {
-    public class QuestionsServices
+    public interface IQuestionsServices
+    {
+        Task<List<Question>> GetAsync();
+
+        Task<Question?> GetAsync(string id);
+
+        Task<List<Question>> GetAsync_id_cat(string id);
+        Task CreateAsync(Question newUser);
+
+        Task UpdateAsync(string id, Question updatedQuestion);
+
+        Task RemoveAsync(string id);
+    }
+    public class QuestionsServices : IQuestionsServices
     {
         private readonly IMongoCollection<Question> _QuestionCollection;
 
