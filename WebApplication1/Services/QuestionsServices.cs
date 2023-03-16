@@ -42,8 +42,8 @@ namespace WebApplication1.Services
 
         public async Task<List<Question>> GetAsync_id_cat(string id) =>
             await _QuestionCollection.Find(x => x.id_category == id).ToListAsync();
-        public async Task CreateAsync(Question newUser) =>
-            await _QuestionCollection.InsertOneAsync(newUser);
+        public async Task CreateAsync(Question newquestion) =>
+            await _QuestionCollection.InsertOneAsync(newquestion);
 
         public async Task UpdateAsync(string id, Question updatedQuestion) =>
             await _QuestionCollection.ReplaceOneAsync(x => x.Id == id, updatedQuestion);

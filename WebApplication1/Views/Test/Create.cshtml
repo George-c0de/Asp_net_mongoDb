@@ -32,7 +32,7 @@
 		border-radius: 40%;
 	}
 </style>
-<form method="post" asp-action="CreateTest" asp-controller="Test" asp-anti-forgery="true">
+	<form method="post" asp-action="CreateTest" asp-controller="Test" asp-anti-forgery="true" class="text-center"> 
 	<div class="validation" asp-validation-summary="ModelOnly"></div>
 	<div>
 			<label>Введите название</label>
@@ -58,6 +58,7 @@
 		</div>
 	</div>
 </form>
+
 <script>
 	
 	$('#btn1').click(function() {

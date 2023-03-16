@@ -12,19 +12,6 @@ namespace WebApplication1.Services
 	}
     public class EmailMessageSender : IEmailMessageSender
     {
-        //private string email;
-        //private string id;
-        //private Result result;
-        //private string name;
-
-        //public EmailMessageSender(string email,string id,Result result,string name)
-        //{
-        //    this.email = email;
-        //    this.id = id;
-        //    this.result = result;
-        //    this.name = name;
-        //}
-
         public void Send(string email, string id, Result result, string name)
         {
             MailAddress from = new MailAddress("allaxverdiyevparviz@gmail.com", "OnlineTest");

@@ -177,9 +177,7 @@ namespace WebApplication1.Controllers
 
         public async Task<int> GetCorrectAnswers(List<Dictionary<string, string>> result)
         {
-            int col = result.Count();
-            int percent = 0;
-            int right = 0;
+			int right = 0;
             foreach (var el in result)
             {
                 var v = await _questionServices.GetAsync(el["id"]);
@@ -341,6 +339,7 @@ namespace WebApplication1.Controllers
             var newRes = new Result { Value = "false", Id_test = id };
             await _resultatservices.CreateAsync(newRes);
             var a = await _resultatservices.GetAsync(newRes.Id);
+            
             return Json(a);
         }
 
@@ -356,7 +355,9 @@ namespace WebApplication1.Controllers
             public string Quantity;
             public string Category;
         }
-        [HttpPost]
+
+		
+		[HttpPost]
         public async Task<IActionResult> CreateTest()
         {
             if (await CheckUser())
@@ -492,18 +493,19 @@ namespace WebApplication1.Controllers
             var tests = await _testsService.GetAsync();
             string f = Request.Form["Field"];
             f = f.Trim();
-            foreach (var i in tests.ToList().Where(x=>x.Name.Equals(f)))
+            foreach (var i in tests.ToList().Where(x => x.Name.Equals(f)))
             {
                 if (i.Name == f)
                 {
-                   _emailServices.Send(CheckTestName(f).Result, CheckUserById().Result);
+                    _emailServices.Send(CheckTestName(f).Result, CheckUserById().Result);
                 }
                 else
                 {
-                    return NotFound();
+                    return View("NotFound");
                 }
             }
-            return Redirect("/test/OpenTestById");
+            return NoContent();
+
         }
         //ostanovka
         public async Task<string> CheckTestName(string f)

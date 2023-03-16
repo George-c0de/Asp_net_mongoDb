@@ -39,8 +39,8 @@ namespace WebApplication1.Services
         public async Task<Category?> GetAsync(string id) =>
             await _CategoryCollection.Find(x => x.Id == id).FirstOrDefaultAsync();
 
-        public async Task CreateAsync(Category newUser) =>
-            await _CategoryCollection.InsertOneAsync(newUser);
+        public async Task CreateAsync(Category newCategory) =>
+            await _CategoryCollection.InsertOneAsync(newCategory);
 
         public async Task UpdateAsync(string id, Category updatedCategory) =>
             await _CategoryCollection.ReplaceOneAsync(x => x.Id == id, updatedCategory);
