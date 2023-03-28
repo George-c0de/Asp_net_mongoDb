@@ -9,7 +9,6 @@ namespace WebApplication1.ViewModels
 
         [Required(ErrorMessage = "Не указан ответ")]
         public string Answer { get; set; }
-        public string Complexity { get; set; }
         public string id_category { get; set; }
 
         [Required(ErrorMessage = "Не указано примечание, если его нет установите '-'")]

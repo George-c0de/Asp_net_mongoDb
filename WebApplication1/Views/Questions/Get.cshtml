@@ -38,15 +38,6 @@
 			<span asp-validation-for="Note" />
 		</div>
 		<div class="form-group">
-			<label asp-for="Complexity">Введите приоритет</label>
-			<select asp-for="Complexity" id="Complexity">
-				<option>низкий</option>
-				<option>средний</option>
-				<option>высокий</option>
-			</select>
-			<span asp-validation-for="Note" />
-		</div>
-		<div class="form-group">
 			<input value="@ViewData["id"]" type="hidden" asp-for="id_category" />
 			<span asp-validation-for="id_category" />
 		</div>

@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.VisualBasic;
 using WebApplication1.ViewModels;
 using static System.Net.Mime.MediaTypeNames;
+using static WebApplication1.Controllers.TestController;
 
 namespace WebApplication1.Controllers
 {
@@ -53,9 +54,6 @@ namespace WebApplication1.Controllers
             }
             return false;
         }
-
-     
-
         public class SaveResultClass
         {
             public string id { get; set; }
@@ -68,12 +66,12 @@ namespace WebApplication1.Controllers
         private readonly IQuestionsServices _questionServices;
         private readonly IEmailMessageSender _emailServices;
         private readonly IUsersService _usersService;
-        //private readonly IRepository repo;
 
         public TestController(
             ITestServices testsService, ICategoryServices categoryServices,
             IResultServices resultServices, IQuestionsServices questionServices,
-            IEmailMessageSender emailServices, IUsersService usersService)
+            IEmailMessageSender emailServices, IUsersService usersService
+			)
         {
             _usersService = usersService;
             _resultatservices = resultServices;
@@ -81,7 +79,6 @@ namespace WebApplication1.Controllers
             _categoryServices = categoryServices;
             _questionServices = questionServices;
             _emailServices = emailServices;
-            //repo = r;
         }
 
 
@@ -117,64 +114,7 @@ namespace WebApplication1.Controllers
         }
 
 
-        public async Task<List<TestResult>> GetAnalysis(List<SaveResultClass> result)
-        {
-            List<TestResult> cat2 = new List<TestResult>();
-            int col = result.Count;
-            foreach (var el in result)
-            {
-                TestResult a = new TestResult();
-                a.SetRight(0);
-                double right = 0;
-                bool flag = false;
-                var name_ = await _categoryServices.GetAsync(el.id_category);
-                var name = name_.Name;
-                a.SetName(name_.Name);
-                var q = await _questionServices.GetAsync(el.id);
-                if (el.answer == q.Answer)
-                {
-
-                    if (q.Complexity == "средний")
-                    {
-                        right = 2;
-                    }
-                    else if (q.Complexity == "высокий")
-                    {
-                        right = 3;
-                    }
-                    else
-                        right = 1;
-                    a.SetRight(right);
-                }
-                foreach (var l in cat2)
-                {
-                    var id_c_ = await _categoryServices.GetAsync(el.id_category);
-                    var id_c = id_c_.Name;
-                    if (id_c == l.GetName())
-                    {
-                        flag = true;
-                    }
-                }
-                if (!flag)
-                {
-                    cat2.Add(a);
-                }
-                else
-                {
-                    for (int i = 0; i < cat2.Count; i++)
-                    {
-                        if (cat2[i].GetName() == name)
-                        {
-                            string new_name = cat2[i].GetName() + right;
-                            cat2[i].SetName(new_name);
-                        }
-                    }
-                }
-            }
-            return cat2;
-        }
-
-
+      
         public async Task<int> GetCorrectAnswers(List<Dictionary<string, string>> result)
         {
 			int right = 0;
@@ -183,15 +123,6 @@ namespace WebApplication1.Controllers
                 var v = await _questionServices.GetAsync(el["id"]);
                 if (v.Answer == el["answer"])
                 {
-                    if (v.Complexity == "средний")
-                    {
-                        right *= 2;
-                    }
-
-                    if (v.Complexity == "высокий")
-                    {
-
-                    }
                     right++;
                 }
             }
@@ -224,7 +155,56 @@ namespace WebApplication1.Controllers
             _emailServices.Send(email, id, t, test);
             return Redirect("/test/OpenTestById");
         }
-        [HttpPost]
+
+
+		public async Task<List<TestResult>> GetAnalysis(List<SaveResultClass> result, double right)
+		{
+			List<TestResult> cat2 = new List<TestResult>();
+			int col = result.Count;
+			foreach (var el in result)
+			{
+				TestResult a = new TestResult();
+				a.SetRight(0);
+				//double right = 0;
+				bool flag = false;
+				var name_ = await _categoryServices.GetAsync(el.id_category);
+				var name = name_.Name;
+				a.SetName(name_.Name);
+				var q = await _questionServices.GetAsync(el.id);
+				if (el.answer == q.Answer)
+				{
+					right += 1;
+					a.SetRight(right);
+				}
+				foreach (var l in cat2)
+				{
+					var id_c_ = await _categoryServices.GetAsync(el.id_category);
+					var id_c = id_c_.Name;
+					if (id_c == l.GetName())
+					{
+						flag = true;
+					}
+				}
+				if (!flag)
+				{
+					cat2.Add(a);
+				}
+				else
+				{
+					for (int i = 0; i < cat2.Count(); i++)
+					{
+						if (cat2[i].GetName() == name)
+						{
+							string new_name = cat2[i].GetName();
+							cat2[i].SetName(new_name);
+						}
+					}
+				}
+			}
+			return cat2;
+		}
+
+		[HttpPost]
         [AllowAnonymous]
         public async Task<IActionResult> SaveResult()
         {
@@ -245,33 +225,27 @@ namespace WebApplication1.Controllers
                 result.Add(res_temp2);
             }
             var res_ = await _resultatservices.GetAsync(id_result);
-            var analis = await GetAnalysis(result);
+            var analis = await GetAnalysis(result,0);
 
             var keyValuePairs = analis.OrderBy(pair => pair.GetRight());
             double temp_per = await GetPercent(result);
-            double percent = Math.Round(temp_per, 2);
+            int percent = Convert.ToInt32(temp_per);
             string rec;
-            if (keyValuePairs.Count() != 1 && percent != 0)
-            {
-                rec = "Мы рекомендуем вам поступать на " + keyValuePairs.Last().GetName();
-
-            }
-            else if (percent == 0)
-            {
-                rec = "Тест пройден на 0%\nТемы, которые стоит повторить:\n";
-                foreach (var el in keyValuePairs)
-                {
-                    rec += el.GetName();
-                    rec += ", ";
-                }
-            }
-            else
-            {
-                rec = "Тест пройден на " + percent + "%";
-                rec += ". Мы рекомендуем вам поступать на " + keyValuePairs.Last().GetName();
-
-            }
-            ViewBag.Re = analis;
+			if (keyValuePairs.Count() == 1 && percent != 0)
+			{
+				rec = "Мы рекомендуем вам поступать на " + keyValuePairs.First().GetName();
+                
+			}
+			else if (percent == 0)
+			{
+				rec = "Тест пройден на 0%\nНичего, 🙂 получится в следующий раз:\n";
+			}
+			else
+			{
+				rec = "Тест пройден на " + percent + "%";
+				rec += ". Мы рекомендуем вам поступать на " + keyValuePairs.Last().GetName();
+			}
+			ViewBag.Re = analis;
             Dictionary<string, double> a = new Dictionary<string, double>();
             foreach (var el in analis)
             {
@@ -339,11 +313,9 @@ namespace WebApplication1.Controllers
             var newRes = new Result { Value = "false", Id_test = id };
             await _resultatservices.CreateAsync(newRes);
             var a = await _resultatservices.GetAsync(newRes.Id);
-            
             return Json(a);
         }
-
-        public class TestQuestions
+		public class TestQuestions
         {
             public string Text;
             public string Answer;
@@ -356,7 +328,6 @@ namespace WebApplication1.Controllers
             public string Category;
         }
 
-		
 		[HttpPost]
         public async Task<IActionResult> CreateTest()
         {
@@ -366,7 +337,7 @@ namespace WebApplication1.Controllers
             }
             List<Dictionary<string, string>> questions = new List<Dictionary<string, string>>();
             List<Questions> questions2 = new List<Questions>();
-            Dictionary<string, string> quest = new Dictionary<string, string>();
+			Dictionary<string, string> quest = new Dictionary<string, string>();
             string col = "col";
             string cat = "cat";
             for (int i = 0; i < Convert.ToInt16(Request.Form["h_col"][0]); i++)
@@ -402,9 +373,8 @@ namespace WebApplication1.Controllers
                     i = -1;
                 }
             }
-            var newUser = new Test { Name = Request.Form["name"][0], Questions = questions2, Time = Request.Form["time"][0] };
-            await _testsService.CreateAsync(newUser);
-
+            var newTest = new Test { Name = Request.Form["name"][0], Questions = questions2, Time = Request.Form["time"][0]};
+            await _testsService.CreateAsync(newTest);
             return Redirect(@Url.Action("OpenTestById", "Test"));
         }
 
@@ -417,7 +387,6 @@ namespace WebApplication1.Controllers
             List<Category> b = a;
             return Json(b);
         }
-
         [Microsoft.AspNetCore.Mvc.HttpGet("{id:length(24)}")]
         public async Task<ActionResult<string>> CreateCodeForTest(string id)
         {
@@ -431,11 +400,11 @@ namespace WebApplication1.Controllers
                 ActionResult<string> log = await GetCategory(cat.Category);
                 string name = log.Value;
                 ViewData[(cat.Category)] = name;
-            }
+			}
             return View(test);
         }
 
-        [Microsoft.AspNetCore.Mvc.HttpGet]
+		[Microsoft.AspNetCore.Mvc.HttpGet]
         public async Task<ActionResult<string>> GetCategory(string id)
         {
             if (await CheckUser())
@@ -450,28 +419,7 @@ namespace WebApplication1.Controllers
             return category.Name;
         }
 
-        [Microsoft.AspNetCore.Mvc.HttpPost]
-        [Microsoft.AspNetCore.Mvc.ValidateAntiForgeryToken]
-        //public async Task<IActionResult> Create([FromForm] TestModel model)
-        //{
-        //    Request.ContentType = "application/json";
-        //    if (ModelState.IsValid)
-        //    {
-        //        var user = await _testsService.GetAsync();
-        //        foreach (var el in user.AsReadOnly())
-        //        {
-        //            if (el.Name == model.Name)
-        //            {
-        //                ModelState.AddModelError("", "Некорректные логин и(или) пароль");
-        //                //вывод ошибки
-        //            }
-        //        }
-        //        // добавляем пользователя в бд
-        //        var newTest = new Test { Name = model.Name, Questions = model.Questions };
-        //        await _testsService.CreateAsync(newTest);
-        //        return CreatedAtAction(nameof(Get), new { id = newTest.Id }, newTest);
-        //    }
-        //}
+     
         public IActionResult Index()
         {
             return View();
@@ -537,21 +485,5 @@ namespace WebApplication1.Controllers
             }
             return nm;
         }
-
-
-        //public async Task<string> CheckUserId(string id)
-        //{
-        //    var user_name = User.Identity.Name;
-        //    var users = await _usersService.GetAsync();
-        //    foreach (var el in users)
-        //    {
-        //        if (el.Id != null)
-        //        {
-        //            id = el.Id;
-        //        }
-        //    }
-        //    return id;
-        //}
-
     }
 }

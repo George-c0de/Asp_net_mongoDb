@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using WebApplication1.Controllers;
@@ -13,7 +14,8 @@ namespace WebApplication1.Models
         
         [Display(Name = "Значение")]
         public string Value { get; set; }
-        [Display(Name = "Тест")]
+		
+		[Display(Name = "Тест")]
         public string Id_test { get; set; }
 
         [Display(Name = "Ответы")]
@@ -27,7 +29,6 @@ namespace WebApplication1.Models
 
         [Display(Name = "рекомендации")]
         public string recommendations { get; set; }
-
         
     }
 }

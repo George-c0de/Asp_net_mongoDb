@@ -2,42 +2,43 @@
 @using WebApplication1.Controllers
 @model WebApplication1.Models.Test
 <style>
-	button {
+	.button {
 		margin: 6px;
 		margin-left: 1px;
 		margin-right: 20px;
 	}
-	input {
+
+	.input {
 		width: 300px;
 		height: 30px;
 		margin: 5px;
 	}
 </style>
 <main class="text-center">
-	<h1 class="text-center">@Model.Name</h1><br/>
+	<h1 class="text-center">@Model.Name</h1><br />
 
 	@foreach (var el in Model.Questions)
 	{
-				<h6>Категория: @ViewData[el.Category]</h6>
-		
-				<p>Кол-во вопросов: @el.Quantity</p>
+		<h6>Категория: @ViewData[el.Category]</h6>
+
+		<p>Кол-во вопросов: @el.Quantity</p>
 	}
 	<h5>Время на тест: @Model.Time</h5>
 
 	<label>Код:</label>
-	<input id="cop" readonly="true"/>
-	<button class="btn btn-dark" type="button" id="b1">Создать ссылку</button>
+	<input id="cop" class="input" readonly="true" />
+	<button class="btn btn-dark button" type="button" id="b1">Создать ссылку</button>
 	<div id="mess"></div>
 </main>
 
 <script type="text/javascript">
-	$('#b1').click(function() {
+	$('#b1').click(function () {
 		id = String("@Model.Id");
 		$.ajax({
 			type: 'GET',
-			url:'/test/GetUrl?id=' + id,
+			url: '/test/GetUrl?id=' + id,
 			dataType: 'json',
-			success: function(data) {
+			success: function (data) {
 				let url = data.id;
 				$("#cop").attr("value", url);
 				var copyText = document.getElementById("cop");
@@ -49,10 +50,10 @@
 					{
 						'text': 'Код скопирован в буфер обмена'
 					}));
-				$("#mess").css('margin-left','180px');
+				$("#mess").css('margin-left', '180px');
 				$("#mess").hide(3000);
 			}
 		});
-		
+
 	});
 </script>

@@ -1,5 +1,4 @@
 ﻿@model WebApplication1.Models.Test
-
 <style>
 	.noselect {
 		-moz-user-select: none;
@@ -66,7 +65,7 @@
 	{
 		
 				<input id="coli" type="hidden" value="@el.Quantity"/>
-				for (int i = 0; i < Convert.ToInt16(el.Quantity); i++)
+				for (int i = 0; i < Convert.ToInt32(el.Quantity); i++)
 				{
 					<div class="pad">
 						<label></label>
@@ -81,6 +80,7 @@
 	<button type="submit" class="btn btn-secondary">Ответить</button>
 </form>
 <script>
+
 	function getRandomInt(max) {
 		return Math.floor(Math.random() * max);
 	}
@@ -202,7 +202,6 @@
 				$("#qv").text('adada');
 			}
 		}
-
 		$('#c_1').hide(0);
 	});
 </script>

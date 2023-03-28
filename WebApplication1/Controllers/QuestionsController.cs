@@ -105,7 +105,7 @@ namespace WebApplication1.Controllers
                 {
                     note_ = model.Note;
                 }
-                var newQuestion = new Question { Text = model.Text, Answer = model.Answer, Note = note_, id_category = model.id_category, Complexity = model.Complexity };
+                var newQuestion = new Question { Text = model.Text, Answer = model.Answer, Note = note_, id_category = model.id_category};
                 await _questionsService.CreateAsync(newQuestion);
             }
 

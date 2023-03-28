@@ -1,0 +1,46 @@
+* {
+    box-sizing: border-box;
+}
+
+.form {
+    position: relative;
+    margin: 1em;
+}
+
+.inpt {
+    display: block;
+    width: 100%;
+    height: 1.3em;
+    line-height: 3em;
+    border-radius: 1em;
+    padding: 0 0.5em;
+    position: relative;
+}
+
+.but {
+    position: absolute;
+    top: .1em;
+    right: .1em;
+    width: 3em;
+    height: 1em;
+    border-radius: 1em;
+    border: 1px solid;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1em;
+    background-color: #0d6efd;
+    border: 1px solid #0d6efd;
+    color: #fff;
+}
+
+.but:hover {
+    color: #fff;
+    background-color: #0b5ed7;
+    border-color: #0a58ca;
+}
+.er {
+    top: 0.5em;
+    position: relative;
+}

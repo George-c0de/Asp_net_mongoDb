@@ -27,6 +27,7 @@ builder.Services.AddSingleton<ICategoryServices,CategoryServices>();
 builder.Services.AddSingleton<IQuestionsServices,QuestionsServices>();
 builder.Services.AddSingleton<IResultServices,ResultServices>();
 builder.Services.AddSingleton<IEmailMessageSender,EmailMessageSender>();
+//builder.Services.AddSingleton<IKeyServices, KeyServices>();
 //IMongoCollection<Users> Users; // ��������� � ���� ������
 //IGridFSBucket gridFS;
 //////MongoDB
@@ -35,7 +36,7 @@ builder.Services.AddSingleton<IEmailMessageSender,EmailMessageSender>();
 //var client = new MongoClient(settings);
 //var database = client.GetDatabase("test");
 //gridFS = new GridFSBucket(database);
-//Users = database.GetCollection<Users>("Products");
+//Users = database.GetCollection<Users>("Users");
 
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
 	.AddCookie(options =>

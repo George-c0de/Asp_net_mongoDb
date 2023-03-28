@@ -18,8 +18,7 @@ namespace WebApplication1.Models
 
         [Display(Name = "id Категории")]
         public string id_category { get; set; }
-        [Display(Name = "Приоритет")]
-        public string Complexity { get; set; }
+
 
         [Display(Name = "Примечание")]
         public string Note { get; set; }
