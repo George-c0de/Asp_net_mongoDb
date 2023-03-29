@@ -157,7 +157,8 @@ namespace WebApplication1.Controllers
         }
 
 
-		public async Task<List<TestResult>> GetAnalysis(List<SaveResultClass> result, double right)
+		
+        public async Task<List<TestResult>> GetAnalysis(List<SaveResultClass> result)
 		{
 			List<TestResult> cat2 = new List<TestResult>();
 			int col = result.Count;
@@ -165,15 +166,17 @@ namespace WebApplication1.Controllers
 			{
 				TestResult a = new TestResult();
 				a.SetRight(0);
-				//double right = 0;
-				bool flag = false;
+                //double right = 0;
+                bool flag = false;
 				var name_ = await _categoryServices.GetAsync(el.id_category);
 				var name = name_.Name;
 				a.SetName(name_.Name);
 				var q = await _questionServices.GetAsync(el.id);
 				if (el.answer == q.Answer)
 				{
+                    double right=0;
 					right += 1;
+                    
 					a.SetRight(right);
 				}
 				foreach (var l in cat2)
@@ -225,7 +228,7 @@ namespace WebApplication1.Controllers
                 result.Add(res_temp2);
             }
             var res_ = await _resultatservices.GetAsync(id_result);
-            var analis = await GetAnalysis(result,0);
+            var analis = await GetAnalysis(result);
 
             var keyValuePairs = analis.OrderBy(pair => pair.GetRight());
             double temp_per = await GetPercent(result);
