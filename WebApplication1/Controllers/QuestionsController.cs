@@ -17,7 +17,6 @@ namespace WebApplication1.Controllers
         private readonly ICategoryServices _categoryService;
         private readonly IUsersService _usersService;
 
-
         public QuestionsController(IQuestionsServices questionsService, 
             ICategoryServices categoryService, IUsersService usersService)
         {

@@ -130,7 +130,7 @@ public class UsersController : Controller
                 }
             }
             // добавляем пользователя в бд
-            var newUser = new Users {Name = model.Name, Password = model.Password, Surname = "", Email = model.Email};
+            var newUser = new Users {Name = model.Name, Password = model.Password, Surname = "", Email = model.Email, Role = "user"};
             await _usersService.CreateAsync(newUser);
             return Redirect(Url.Action("Login","Users"));
         }

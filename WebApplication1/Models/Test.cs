@@ -18,6 +18,7 @@ namespace WebApplication1.Models
 
         [Display(Name = "Вопросы")]
         public List<TestController.Questions> Questions { get; set; }
+        
 
         [Display(Name = "Время")]
         public string Time { get; set; }

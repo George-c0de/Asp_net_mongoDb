@@ -1,164 +1,157 @@
-﻿using System.Collections.Generic;
-using System.Net;
-using System.Net.Mail;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using WebApplication1.Models;
 using WebApplication1.Services;
 using Controller = Microsoft.AspNetCore.Mvc.Controller;
 using JsonResult = Microsoft.AspNetCore.Mvc.JsonResult;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.VisualBasic;
-using WebApplication1.ViewModels;
-using static System.Net.Mime.MediaTypeNames;
-using static WebApplication1.Controllers.TestController;
 
 namespace WebApplication1.Controllers
 {
-    [ApiController]
-    [Authorize]
-    [Route("test/[action]")]
-    public class TestController : Controller
-    {
-        public class TestResult
-        {
-            private string Name;
-            private double Right;
+	[ApiController]
+	[Authorize]
+	[Route("test/[action]")]
+	public class TestController : Controller
+	{
+		public class TestResult
+		{
+			private string Name;
+			private double Right;
 
-            public void SetRight(double n)
-            {
-                Right = n;
-            }
-            public double GetRight()
-            {
-                return Right;
-            }
-            public void SetName(string n)
-            {
-                Name = n;
-            }
-            public string GetName()
-            {
-                return Name;
-            }
-        }
-        public async Task<bool> CheckUser()
-        {
-            var user_name = User.Identity.Name;
-            var users = await _usersService.GetAsync();
-            foreach (var el in users)
-            {
-                if (el.Name == user_name && el.Role != "admin")
-                {
-                    return true;
-                }
-            }
-            return false;
-        }
-        public class SaveResultClass
-        {
-            public string id { get; set; }
-            public string id_category { get; set; }
-            public string answer { get; set; }
-        }
-        private readonly ITestServices _testsService;
-        private readonly ICategoryServices _categoryServices;
-        private readonly IResultServices _resultatservices;
-        private readonly IQuestionsServices _questionServices;
-        private readonly IEmailMessageSender _emailServices;
-        private readonly IUsersService _usersService;
+			public void SetRight(double n)
+			{
+				Right = n;
+			}
+			public double GetRight()
+			{
+				return Right;
+			}
+			public void SetName(string n)
+			{
+				Name = n;
+			}
+			public string GetName()
+			{
+				return Name;
+			}
+		}
+		public async Task<bool> CheckUser()
+		{
+			var user_name = User.Identity.Name;
+			var users = await _usersService.GetAsync();
+			foreach (var el in users)
+			{
+				if (el.Name == user_name && el.Role != "admin" && el.Role != "moderator")
+				{
+					return true;
+				}
+			}
+			return false;
+		}
+		public class SaveResultClass
+		{
+			public string id { get; set; }
+			public string id_category { get; set; }
+			public string answer { get; set; }
+		}
+		private readonly ITestServices _testsService;
+		private readonly ICategoryServices _categoryServices;
+		private readonly IResultServices _resultatservices;
+		private readonly IQuestionsServices _questionServices;
+		private readonly IEmailMessageSender _emailServices;
+		private readonly IUsersService _usersService;
 
-        public TestController(
-            ITestServices testsService, ICategoryServices categoryServices,
-            IResultServices resultServices, IQuestionsServices questionServices,
-            IEmailMessageSender emailServices, IUsersService usersService
+		public TestController(
+			ITestServices testsService, ICategoryServices categoryServices,
+			IResultServices resultServices, IQuestionsServices questionServices,
+			IEmailMessageSender emailServices, IUsersService usersService
 			)
-        {
-            _usersService = usersService;
-            _resultatservices = resultServices;
-            _testsService = testsService;
-            _categoryServices = categoryServices;
-            _questionServices = questionServices;
-            _emailServices = emailServices;
-        }
+		{
+			_usersService = usersService;
+			_resultatservices = resultServices;
+			_testsService = testsService;
+			_categoryServices = categoryServices;
+			_questionServices = questionServices;
+			_emailServices = emailServices;
+		}
 
 
 		[HttpGet]
-        public async Task<IActionResult> Create()
-        {
-            if (await CheckUser())
-            {
-                return StatusCode(403);
-            }
-            var category = await _categoryServices.GetAsync();
+		public async Task<IActionResult> Create()
+		{
+			if (await CheckUser())
+			{
+				return StatusCode(403);
+			}
+			var category = await _categoryServices.GetAsync();
 
-            return View(category);
-        }
-
-
-        [HttpGet]
-        [AllowAnonymous]
-        public async Task<JsonResult> GetQuestion(string id)
-        {
-            var a = await _resultatservices.GetAsync(id);
-            return Json(a);
-        }
-
-        public async Task<string> GetCategoryByQuestion(string id)
-        {
-            var a = await _questionServices.GetAsync(id);
-            if (a == null)
-            {
-                return "error";
-            }
-            return a.id_category;
-        }
+			return View(category);
+		}
 
 
-      
-        public async Task<int> GetCorrectAnswers(List<Dictionary<string, string>> result)
-        {
+		[HttpGet]
+		[AllowAnonymous]
+		public async Task<JsonResult> GetQuestion(string id)
+		{
+			var a = await _resultatservices.GetAsync(id);
+			return Json(a);
+		}
+
+		public async Task<string> GetCategoryByQuestion(string id)
+		{
+			var a = await _questionServices.GetAsync(id);
+			if (a == null)
+			{
+				return "error";
+			}
+			return a.id_category;
+		}
+
+
+
+		public async Task<int> GetCorrectAnswers(List<Dictionary<string, string>> result)
+		{
 			int right = 0;
-            foreach (var el in result)
-            {
-                var v = await _questionServices.GetAsync(el["id"]);
-                if (v.Answer == el["answer"])
-                {
-                    right++;
-                }
-            }
-            return right;
-        }
-        public async Task<double> GetPercent(List<SaveResultClass> result)
-        {
-            double col = result.Count();
-            double right = 0;
-            foreach (var el in result)
-            {
-                var v = await _questionServices.GetAsync(el.id);
-                if (v.Answer == el.answer)
-                {
-                    right++;
-                }
-            }
-            double percent = right / col * 100;
-            return percent;
-        }
-        [HttpPost]
-        [AllowAnonymous]
-        public async Task<IActionResult> SendMessage()
-        {
-            string email = Request.Form["email"];
-            string id = Request.Form["id"];
-            Result t = await _resultatservices.GetAsync(id);
-            var test_ = await _testsService.GetAsync(t.Id_test);
-            var test = test_.Name;
-            _emailServices.Send(email, id, t, test);
-            return Redirect("/test/OpenTestById");
-        }
+			foreach (var el in result)
+			{
+				var v = await _questionServices.GetAsync(el["id"]);
+				if (v.Answer == el["answer"])
+				{
+					right++;
+				}
+			}
+			return right;
+		}
+		public async Task<double> GetPercent(List<SaveResultClass> result)
+		{
+			double col = result.Count();
+			double right = 0;
+			foreach (var el in result)
+			{
+				var v = await _questionServices.GetAsync(el.id);
+				if (v.Answer == el.answer)
+				{
+					right++;
+				}
+			}
+			double percent = right / col * 100;
+			return percent;
+		}
+		[HttpPost]
+		[AllowAnonymous]
+		public async Task<IActionResult> SendMessage()
+		{
+			string email = Request.Form["email"];
+			string id = Request.Form["id"];
+			Result t = await _resultatservices.GetAsync(id);
+			var test_ = await _testsService.GetAsync(t.Id_test);
+			var test = test_.Name;
+			_emailServices.Send(email, id, t, test);
+			return Redirect("/test/OpenTestById");
+		}
 
 
-		
-        public async Task<List<TestResult>> GetAnalysis(List<SaveResultClass> result)
+
+		public async Task<List<TestResult>> GetAnalysis(List<SaveResultClass> result)
 		{
 			List<TestResult> cat2 = new List<TestResult>();
 			int col = result.Count;
@@ -166,17 +159,16 @@ namespace WebApplication1.Controllers
 			{
 				TestResult a = new TestResult();
 				a.SetRight(0);
-                //double right = 0;
-                bool flag = false;
+				//double right = 0;
+				bool flag = false;
 				var name_ = await _categoryServices.GetAsync(el.id_category);
 				var name = name_.Name;
 				a.SetName(name_.Name);
 				var q = await _questionServices.GetAsync(el.id);
 				if (el.answer == q.Answer)
 				{
-                    double right=0;
+					double right = 0;
 					right += 1;
-                    
 					a.SetRight(right);
 				}
 				foreach (var l in cat2)
@@ -208,36 +200,36 @@ namespace WebApplication1.Controllers
 		}
 
 		[HttpPost]
-        [AllowAnonymous]
-        public async Task<IActionResult> SaveResult()
-        {
-            int col = Convert.ToInt16(Request.Form["col_answer"]);
-            string id_result = Request.Form["id_result"].ToString();
-            List<SaveResultClass> result = new List<SaveResultClass>();
-            for (int i = 0; i < col; i++)
-            {
-                string name_id = "id" + i;
-                string name_an = "q" + i;
-                string id_a = Request.Form[name_id].ToString();
-                string answer = Request.Form[name_an].ToString();
-                SaveResultClass res_temp2 = new SaveResultClass();
-                res_temp2.id = id_a;
-                res_temp2.answer = answer;
-                var val = await GetCategoryByQuestion(id_a);
-                res_temp2.id_category = val;
-                result.Add(res_temp2);
-            }
-            var res_ = await _resultatservices.GetAsync(id_result);
-            var analis = await GetAnalysis(result);
+		[AllowAnonymous]
+		public async Task<IActionResult> SaveResult()
+		{
+			int col = Convert.ToInt16(Request.Form["col_answer"]);
+			string id_result = Request.Form["id_result"].ToString();
+			List<SaveResultClass> result = new List<SaveResultClass>();
+			for (int i = 0; i < col; i++)
+			{
+				string name_id = "id" + i;
+				string name_an = "q" + i;
+				string id_a = Request.Form[name_id].ToString();
+				string answer = Request.Form[name_an].ToString();
+				SaveResultClass res_temp2 = new SaveResultClass();
+				res_temp2.id = id_a;
+				res_temp2.answer = answer;
+				var val = await GetCategoryByQuestion(id_a);
+				res_temp2.id_category = val;
+				result.Add(res_temp2);
+			}
+			var res_ = await _resultatservices.GetAsync(id_result);
+			var analis = await GetAnalysis(result);
 
-            var keyValuePairs = analis.OrderBy(pair => pair.GetRight());
-            double temp_per = await GetPercent(result);
-            int percent = Convert.ToInt32(temp_per);
-            string rec;
+			var keyValuePairs = analis.OrderBy(pair => pair.GetRight());
+			double temp_per = await GetPercent(result);
+			int percent = Convert.ToInt32(temp_per);
+			string rec;
 			if (keyValuePairs.Count() == 1 && percent != 0)
 			{
 				rec = "Мы рекомендуем вам поступать на " + keyValuePairs.First().GetName();
-                
+
 			}
 			else if (percent == 0)
 			{
@@ -249,244 +241,264 @@ namespace WebApplication1.Controllers
 				rec += ". Мы рекомендуем вам поступать на " + keyValuePairs.Last().GetName();
 			}
 			ViewBag.Re = analis;
-            Dictionary<string, double> a = new Dictionary<string, double>();
-            foreach (var el in analis)
-            {
-                a[el.GetName()] = el.GetRight();
-            }
-            var newResult = new Result { Id = res_.Id, Value = "true", Answers = result, Id_test = res_.Id_test, Percent = percent, Percentage_category = a, recommendations = rec };
-            await _resultatservices.RemoveAsync(res_.Id);
-            await _resultatservices.CreateAsync(newResult);
-            return Redirect(@Url.Action("ShowResult", "Test", new { id = res_.Id }));
-        }
+			Dictionary<string, double> a = new Dictionary<string, double>();
+			foreach (var el in analis)
+			{
+				a[el.GetName()] = el.GetRight();
+			}
+			var newResult = new Result { Id = res_.Id, Value = "true", Answers = result, Id_test = res_.Id_test, Percent = percent, Percentage_category = a, recommendations = rec };
+			await _resultatservices.RemoveAsync(res_.Id);
+			await _resultatservices.CreateAsync(newResult);
+			return Redirect(@Url.Action("ShowResult", "Test", new { id = res_.Id }));
+		}
 
-        [HttpGet]
-        [AllowAnonymous]
-        public async Task<IActionResult> ShowResult(string id)
-        {
-            var analis = await _resultatservices.GetAsync(id);
-            var name_ = await _testsService.GetAsync(analis.Id_test);
-            var name = name_.Name;
-			ViewData["userEm"] = CheckUserById().Result;
-            ViewData["name_test"] = name;
-            if (analis == null)
-            {
-                return Redirect("Home");
-            }
-            else
-            {
-                return View(analis);
-            }
-        }
+		[HttpGet]
+		[AllowAnonymous]
+		public async Task<IActionResult> ShowResult(string id)
+		{
+			var analis = await _resultatservices.GetAsync(id);
+			var name_ = await _testsService.GetAsync(analis.Id_test);
+			var name = name_.Name;
+			ViewData["userEm"] = CheckUserByEmail().Result;
+			ViewData["name_test"] = name;
+			if (analis == null)
+			{
+				return Redirect("Home");
+			}
+			else
+			{
+				return View(analis);
+			}
+		}
 
-        [HttpGet]
-        [AllowAnonymous]
-        public async Task<IActionResult> GetPassage(string id)
-        {
-            var res = await _resultatservices.GetAsync(id);
-            var test = await _testsService.GetAsync(res.Id_test);
-            ViewData["id_r"] = id;
-            return View(test);
-        }
-        [HttpPost]
-        [AllowAnonymous]
-        public async Task<JsonResult> GetTest(string id)
-        {
-            if (id.Length != 24)
-            {
-                return Json("Error");
-            }
-            var a = await _resultatservices.GetAsync(id);
-            if (a == null)
-            {
-                return Json("Error");
-            }
-            return Json(a);
-        }
-        [HttpGet]
-        [AllowAnonymous]
-        public IActionResult GetTestByCode()
-        {
-            return View();
-        }
+		[HttpGet]
+		[AllowAnonymous]
+		public async Task<IActionResult> GetPassage(string id)
+		{
+			var res = await _resultatservices.GetAsync(id);
+			var test = await _testsService.GetAsync(res.Id_test);
+			ViewData["id_r"] = id;
+			return View(test);
+		}
+		[HttpPost]
+		[AllowAnonymous]
+		public async Task<JsonResult> GetTest(string id)
+		{
+			if (id.Length != 24)
+			{
+				return Json("Error");
+			}
+			var a = await _resultatservices.GetAsync(id);
+			if (a == null)
+			{
+				return Json("Error");
+			}
+			return Json(a);
+		}
+		[HttpGet]
+		[AllowAnonymous]
+		public IActionResult GetTestByCode()
+		{
+			return View();
+		}
 
-        [HttpGet]
-        public async Task<JsonResult> GetUrl(string id)
-        {
-            var newRes = new Result { Value = "false", Id_test = id };
-            await _resultatservices.CreateAsync(newRes);
-            var a = await _resultatservices.GetAsync(newRes.Id);
-            return Json(a);
-        }
+		[HttpGet]
+		public async Task<JsonResult> GetUrl(string id)
+		{
+			var newRes = new Result { Value = "false", Id_test = id };
+			await _resultatservices.CreateAsync(newRes);
+			var a = await _resultatservices.GetAsync(newRes.Id);
+			return Json(a);
+		}
 		public class TestQuestions
-        {
-            public string Text;
-            public string Answer;
-            public string id_category;
-            public string Note;
-        }
-        public class Questions
-        {
-            public string Quantity;
-            public string Category;
-        }
+		{
+			public string Text;
+			public string Answer;
+			public string id_category;
+			public string Note;
+		}
+		public class Questions
+		{
+			public string Quantity;
+			public string Category;
+		}
 
 		[HttpPost]
-        public async Task<IActionResult> CreateTest()
-        {
-            if (await CheckUser())
-            {
-                return StatusCode(403);
-            }
-            List<Dictionary<string, string>> questions = new List<Dictionary<string, string>>();
-            List<Questions> questions2 = new List<Questions>();
-			Dictionary<string, string> quest = new Dictionary<string, string>();
-            string col = "col";
-            string cat = "cat";
-            for (int i = 0; i < Convert.ToInt16(Request.Form["h_col"][0]); i++)
-            {
-                quest.Clear();
-                Questions quest2 = new Questions();
-                quest2.Quantity = Request.Form[col + i][0];
-                quest2.Category = Request.Form[cat + i][0];
-                quest["Quantity"] = Request.Form[col + i][0];
-                quest["Category"] = Request.Form[cat + i][0];
-                Dictionary<string, string> temp = new Dictionary<string, string>(quest);
-                questions.Add(temp);
-                questions2.Add(quest2);
-            }
-            for (int i = 0; i < questions.Count - 1; i++)
-            {
-                if (questions[i]["Category"] == questions[i + 1]["Category"])
-                {
-                    questions[i]["Quantity"] = (Convert.ToInt16(questions[i]["Quantity"]) +
-                                                                Convert.ToInt16(questions[i + 1]["Quantity"])).ToString();
-                    questions.RemoveAt(i + 1);
-                    i = -1;
-                }
-            }
-
-            for (int i = 0; i < questions2.Count - 1; i++)
-            {
-                if (questions2[i].Category == questions2[i + 1].Category)
-                {
-                    questions2[i].Quantity = (Convert.ToInt16(questions2[i].Quantity) +
-                                                Convert.ToInt16(questions2[i + 1].Quantity)).ToString();
-                    questions2.RemoveAt(i + 1);
-                    i = -1;
-                }
-            }
-            var newTest = new Test { Name = Request.Form["name"][0], Questions = questions2, Time = Request.Form["time"][0]};
-            await _testsService.CreateAsync(newTest);
-            return Redirect(@Url.Action("OpenTestById", "Test"));
-        }
-
-      
-
-        [Microsoft.AspNetCore.Mvc.HttpGet]
-        public async Task<JsonResult> JsonSearch()
-        {
-            var a = await _categoryServices.GetAsync();
-            List<Category> b = a;
-            return Json(b);
-        }
-        [Microsoft.AspNetCore.Mvc.HttpGet("{id:length(24)}")]
-        public async Task<ActionResult<string>> CreateCodeForTest(string id)
-        {
-            if (await CheckUser())
-            {
-                return StatusCode(403);
-            }
-            var test = await _testsService.GetAsync(id);
-            foreach (var cat in test.Questions)
-            {
-                ActionResult<string> log = await GetCategory(cat.Category);
-                string name = log.Value;
-                ViewData[(cat.Category)] = name;
+		public async Task<IActionResult> CreateTest()
+		{
+			if (await CheckUser())
+			{
+				return StatusCode(403);
 			}
-            return View(test);
-        }
+			List<Dictionary<string, string>> questions = new List<Dictionary<string, string>>();
+			List<Questions> questions2 = new List<Questions>();
+			Dictionary<string, string> quest = new Dictionary<string, string>();
+			string col = "col";
+			string cat = "cat";
+			for (int i = 0; i < Convert.ToInt16(Request.Form["h_col"][0]); i++)
+			{
+				quest.Clear();
+				Questions quest2 = new Questions();
+				quest2.Quantity = Request.Form[col + i][0];
+				quest2.Category = Request.Form[cat + i][0];
+				quest["Quantity"] = Request.Form[col + i][0];
+				quest["Category"] = Request.Form[cat + i][0];
+				Dictionary<string, string> temp = new Dictionary<string, string>(quest);
+				questions.Add(temp);
+				questions2.Add(quest2);
+			}
+			for (int i = 0; i < questions.Count - 1; i++)
+			{
+				if (questions[i]["Category"] == questions[i + 1]["Category"])
+				{
+					questions[i]["Quantity"] = (Convert.ToInt16(questions[i]["Quantity"]) +
+																Convert.ToInt16(questions[i + 1]["Quantity"])).ToString();
+					questions.RemoveAt(i + 1);
+					i = -1;
+				}
+			}
+
+			for (int i = 0; i < questions2.Count - 1; i++)
+			{
+				if (questions2[i].Category == questions2[i + 1].Category)
+				{
+					questions2[i].Quantity = (Convert.ToInt16(questions2[i].Quantity) +
+												Convert.ToInt16(questions2[i + 1].Quantity)).ToString();
+					questions2.RemoveAt(i + 1);
+					i = -1;
+				}
+			}
+			var newTest = new Test { Name = Request.Form["name"][0], Questions = questions2, Time = Request.Form["time"][0] };
+			await _testsService.CreateAsync(newTest);
+			return Redirect(@Url.Action("OpenTestById", "Test"));
+		}
+
+
 
 		[Microsoft.AspNetCore.Mvc.HttpGet]
-        public async Task<ActionResult<string>> GetCategory(string id)
-        {
-            if (await CheckUser())
-            {
-                return StatusCode(403);
-            }
-            var category = await _categoryServices.GetAsync(id);
-            if (category is null)
-            {
-                return NotFound();
-            }
-            return category.Name;
-        }
+		public async Task<JsonResult> JsonSearch()
+		{
+			var a = await _categoryServices.GetAsync();
+			List<Category> b = a;
+			return Json(b);
+		}
+		[Microsoft.AspNetCore.Mvc.HttpGet("{id:length(24)}")]
+		public async Task<ActionResult<string>> CreateCodeForTest(string id)
+		{
+			if (await CheckUser())
+			{
+				return StatusCode(403);
+			}
+			var test = await _testsService.GetAsync(id);
+			foreach (var cat in test.Questions)
+			{
+				ActionResult<string> log = await GetCategory(cat.Category);
+				string name = log.Value;
+				ViewData[(cat.Category)] = name;
+			}
+			return View(test);
+		}
 
-     
-        public IActionResult Index()
-        {
-            return View();
-        }
+		[Microsoft.AspNetCore.Mvc.HttpGet]
+		public async Task<ActionResult<string>> GetCategory(string id)
+		{
+			if (await CheckUser())
+			{
+				return StatusCode(403);
+			}
+			var category = await _categoryServices.GetAsync(id);
+			if (category is null)
+			{
+				return NotFound();
+			}
+			return category.Name;
+		}
 
-        [HttpGet]
-        public async Task<IActionResult> OpenTestById()
-        {
-            var vm = new ListCollection();
-            vm.Tests = await _testsService.GetAsync();
-            vm.Users = await _usersService.GetAsync();
-            //return View(repo.GetAll());
-            return View(vm);
-        }
 
-        [HttpPost]
-        public async Task<IActionResult> SendMe()
-        {
-            var tests = await _testsService.GetAsync();
-            string f = Request.Form["Field"];
-            f = f.Trim();
-            foreach (var i in tests.ToList().Where(x => x.Name.Equals(f)))
-            {
-                if (i.Name == f)
-                {
-                    _emailServices.Send(CheckTestName(f).Result, CheckUserById().Result);
-                }
-                else
-                {
-                    return View("NotFound");
-                }
-            }
-            return NoContent();
+		public IActionResult Index()
+		{
+			return View();
+		}
 
-        }
-        //ostanovka
-        public async Task<string> CheckTestName(string f)
-        {
-            
-            var tests = await _testsService.GetAsync();
-            string nm = "";
-            foreach (var el in tests)
-            {
-                if (el.Name == f)
-                {
-                    nm = el.Name;
-                }
-            }
-            return nm;
-        }
+	
 
-        public async Task<string> CheckUserById()
-        {
-            var user_name = User.Identity.Name;
-            var users = await _usersService.GetAsync();
-            string nm = "";
-            foreach (var el in users)
-            {
-                if (el.Name == user_name)
-                {
-                    nm = el.Email;
-                }
-            }
-            return nm;
-        }
-    }
+		[HttpPost]
+		public async Task<IActionResult> SendMe()
+		{
+			var tests = await _testsService.GetAsync();
+			string f = Request.Form["Field"];
+			f = f.Trim();
+			foreach (var i in tests.ToList().Where(x => x.Name.Equals(f)))
+			{
+				if (i.Name == f)
+				{
+					_emailServices.Send(CheckTestName(f).Result, CheckUserByEmail().Result);
+				}
+				else
+				{
+					return View("NotFound");
+				}
+			}
+			return NoContent();
+
+		}
+		//ostanovka
+		public async Task<string> CheckTestName(string f)
+		{
+
+			var tests = await _testsService.GetAsync();
+			string nm = "";
+			foreach (var el in tests)
+			{
+				if (el.Name == f)
+				{
+					nm = el.Name;
+				}
+			}
+			return nm;
+		}
+
+
+		[HttpGet]
+		public async Task<IActionResult> OpenTestById()
+		{
+			var vm = new ListCollection();
+			vm.Tests = await _testsService.GetAsync();
+			ViewBag.rol = CheckUserByRole().Result;
+			//return View(repo.GetAll());
+			return View(vm);
+		}
+
+
+		public async Task<string> CheckUserByEmail()
+		{
+			var user_name = User.Identity.Name;
+			var users = await _usersService.GetAsync();
+			string nm = "";
+			foreach (var el in users)
+			{
+				if (el.Name == user_name)
+				{
+					nm = el.Email;
+				}
+			}
+			return nm;
+		}
+
+
+		public async Task<string> CheckUserByRole()
+		{
+			var user_name = User.Identity.Name;
+			var users = await _usersService.GetAsync();
+			string nm = "";
+			foreach (var el in users)
+			{
+				if (el.Name == user_name)
+				{
+					nm = el.Role;
+				}
+			}
+			return nm;
+		}
+	}
 }
